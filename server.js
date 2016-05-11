@@ -9,6 +9,9 @@
 var express = require("express");
 var app = express();
 
+var FacebookTokenStrategy = require("passport-facebook-token");
+
+
 var passport = require("passport");
 var FacebookTokenStrategy = require("passport-facebook-token");
 //require("./config/passport")(passport);
