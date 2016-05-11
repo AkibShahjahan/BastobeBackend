@@ -1,26 +1,40 @@
-// disribute the files, organize
-// shelf isAuthenticate()
+//===============================
+// TODO:
+	// disribute the files, organize
+	// shelf isAuthenticate()
+//===============================
 
 
 
 var express = require("express");
-var mongoose = require("mongoose");
+var app = express();
+
 var passport = require("passport");
 var FacebookTokenStrategy = require("passport-facebook-token");
+require("./config/passport")(passport);
+
 var http = require("http");
 var url = require("url");
-var bodyParser = require("body-parser");
 var session = require("express-session");
+
+var bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
 var User = require("./models/user");
 var configAuth = require("./config/auth");
 var configDB = require("./config/database")
 
+var mongoose = require("mongoose");
+mongoose.connect(configDB.url);
+// Make sure connection to db is working
+var db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error:"));
+db.once("open", function callback () {
+   console.log('Successfully mongodb is connected');
+});
 
-var app = express();
-
-require("./config/passport")(passport);
-
+app.set("port", process.env.PORT || 3000);
 
 //================================================
 // Don't know if I need this or not
@@ -36,23 +50,7 @@ require("./config/passport")(passport);
 // // Init passport authentication 
  //app.use(passport.initialize());
 // // persistent login sessions 
-
 //================================================
-
-
-app.set("port", process.env.PORT || 3000);
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-mongoose.connect(configDB.url);
-// Make sure connection to db is working
-var db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", function callback () {
-   console.log('Successfully mongodb is connected');
-});
-
-
 
 app.get("/users", function(req, res){
 	User.find({}, function(err, users){
@@ -70,60 +68,11 @@ app.get("/users", function(req, res){
 	});
 });
 
-// passport.use(new FacebookTokenStrategy({
-//         clientID: configAuth.facebookAuth.clientID,
-//         clientSecret: configAuth.facebookAuth.clientSecret,
-//     }, function(accessToken, refreshToken, profile, done) {
-//         console.log(profile);
-//             User.findOne({"facebook.id": profile.id}, function(err, user){
-//     			if(err)
-//     			{
-//     				res.status(500);
-//     				return done(err);
-//     			}
-//     			if(user)
-//     			{
-//     				res.status(200);
-//     				return done(null, user);
-//     			}
-//     			else {
-//     				var newUser = new User();
-//     				newUser.facebook.id = profile.id;
-//     				newUser.facebook.fbToken = accessToken;
-//     				newUser.firstName = profile.name.givenName;
-//     				newUser.lastName = profile.name.familyName;
-//     				newUser.facebook.email = profile.displayName;
-//     				newUser.points = 0;
-//     				newUser.save(function(err){
-//     					if(err)
-//     					{
-//     						res.status(500);
-//     						throw err;
-//     					}
-//     					res.status(201);
-//     					return done(null, newUser);
-//     				})
-//     			}
-//     		});
-//     })
-// );
-
 app.post("/login/facebook", passport.authenticate("facebook-token", {session: false}), function(req, res) {
-    // Congratulations, you're authenticated!
+    // Authenticated!
     res.status(200);
     return res.json({status: "OK"});
 });
-
-
-var middlewareObj = {};
-middlewareObj.isLoggedIn = function(req, res, next){
-	if(req.isAuthenticated())
-	{
-		return next();
-	}
-	res.status(401);
-	res.send({error: "You are unauthenticated."});
-}
 
 app.get("/points/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
@@ -149,6 +98,16 @@ http.createServer(app).listen(app.get("port"), function(){
 
 
 // FOR DEVELOPMENT PURPOSES ===================================================
+
+var middlewareObj = {};
+middlewareObj.isLoggedIn = function(req, res, next){
+	if(req.isAuthenticated())
+	{
+		return next();
+	}
+	res.status(401);
+	res.send({error: "You are unauthenticated."});
+}
 
 app.post("/users", function(req, res){
 	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") && 
