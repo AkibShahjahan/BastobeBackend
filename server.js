@@ -171,7 +171,7 @@ app.get('/points/:id', function(req, res){
 		else
 		{
 
-			res.send(user.point);
+			res.send(user.points.toString());
 		}
 	});
 });
