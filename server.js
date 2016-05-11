@@ -162,7 +162,7 @@ middlewareObj.isLoggedIn = function(req, res, next){
 }
 
 app.get('/points/:id', middlewareObj.isLoggedIn, function(req, res){
-	User.findOne({'fbID': profile.id}, function(err, user){
+	User.findOne({'fbID': req.params.id}, function(err, user){
 		if(err)
 		{
 			console.log(err);
