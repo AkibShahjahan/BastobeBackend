@@ -40,15 +40,15 @@ app.set("port", process.env.PORT || 3000);
 // Don't know if I need this or not
 
 // required for passport session
-// app.use(session({
-//   secret: 'secrettexthere',
-//   saveUninitialized: true,
-//   resave: true,
+app.use(session({
+  secret: 'secrettexthere',
+  saveUninitialized: true,
+  resave: true,
 
-// }));
+}));
 
 // // Init passport authentication 
- //app.use(passport.initialize());
+ app.use(passport.initialize());
 // // persistent login sessions 
 //================================================
 
@@ -127,6 +127,7 @@ app.get("/points/:id", function(req, res){
 		}
 	});
 });
+
 
 http.createServer(app).listen(app.get("port"), function(){
   console.log("Bastobe server listening on port " + app.get("port"));
