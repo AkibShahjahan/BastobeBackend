@@ -117,7 +117,7 @@ app.post("/users", function(req, res){
 			facebook:{
 				id: req.body.fb_id,
 				email: req.body.email,
-				accessToken: "DeveloperMode"
+				//accessToken: "DeveloperMode"
 			},
 			firstName: req.body.first_name,
 			lastName: req.body.last_name,
