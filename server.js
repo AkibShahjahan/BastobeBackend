@@ -171,7 +171,7 @@ app.get('/points/:id', function(req, res){
 		else
 		{
 
-			res.send(user.id);
+			res.send(user);
 		}
 	});
 });
