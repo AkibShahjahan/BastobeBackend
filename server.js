@@ -34,9 +34,9 @@ require("./config/passport")(passport);
 // }));
 
 // // Init passport authentication 
-// app.use(passport.initialize());
+ app.use(passport.initialize());
 // // persistent login sessions 
-// app.use(passport.session());
+ app.use(passport.session());
 
 //================================================
 
