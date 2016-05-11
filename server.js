@@ -9,9 +9,6 @@
 var express = require("express");
 var app = express();
 
-var FacebookTokenStrategy = require("passport-facebook-token");
-
-
 var passport = require("passport");
 var FacebookTokenStrategy = require("passport-facebook-token");
 //require("./config/passport")(passport);
@@ -111,7 +108,7 @@ passport.use(new FacebookTokenStrategy({
 
 app.post("/login/facebook", passport.authenticate("facebook-token", {session: false}), function(req, res) {
     // Authenticated!
-    res.status(200);
+    // res.status(200);
     return res.json({status: "OK"});
 });
 
