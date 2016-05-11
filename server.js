@@ -161,7 +161,7 @@ middlewareObj.isLoggedIn = function(req, res, next){
 	res.send({error: "You are unauthenticated."});
 }
 
-app.get('/points/:id', middlewareObj.isLoggedIn, function(req, res){
+app.get('/points/:id', function(req, res){
 	User.findOne(req.params.id, function(err, user){
 		if(err)
 		{
@@ -171,7 +171,7 @@ app.get('/points/:id', middlewareObj.isLoggedIn, function(req, res){
 		else
 		{
 
-			res.send(user);
+			res.send(user.id);
 		}
 	});
 });
