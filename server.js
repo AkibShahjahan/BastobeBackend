@@ -143,11 +143,18 @@ passport.use(new FacebookTokenStrategy({
     }, function(accessToken, refreshToken, profile, done) {
         console.log(profile);
                     // Do stuff with the profile. You're already getting authenticated data so there's no need to double check anything! For example
-                    User.findOne({'fbID': profile.id}, function(err, user){
+            User.findOne({'fbID': profile.id}, function(err, user){
     			if(err)
+    			{
+    				console.log("hello");
     				return done(err);
+    			}
     			if(user)
+    			{
+    				console.log("hello2");
+
     				return done(null, user);
+    			}
     			else {
     				var newUser = new User();
     				newUser.fbID = profile.id;
@@ -155,7 +162,7 @@ passport.use(new FacebookTokenStrategy({
     				newUser.firstName = profile.name.givenName;
     				newUser.lastName = profile.name.familyName;
     				newUser.email = profile.displayName;
-    				newUser.points = 0;
+    				newUser.points = 1;
     				newUser.save(function(err){
     					if(err)
     						throw err;
@@ -169,6 +176,7 @@ passport.use(new FacebookTokenStrategy({
 
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!
+    console.log("LOGGED");
     return res.json({status: 'OK'});
 });
 
