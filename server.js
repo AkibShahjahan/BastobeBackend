@@ -147,6 +147,7 @@ middlewareObj.isLoggedIn = function(req, res, next){
 	res.send({error: "You are unauthenticated."});
 }
 
+
 app.post("/users", function(req, res){
 	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") && 
 		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email"))
