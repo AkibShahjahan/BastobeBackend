@@ -12,29 +12,31 @@ var url = require("url");
 var bodyParser = require("body-parser");
 var session = require("express-session");
 
-var User = require("./models/user.js");
-var configAuth = require("./config/auth.js");
-var configDB = require("./config/database.js")
+var User = require("./models/user");
+var configAuth = require("./config/auth");
+var configDB = require("./config/database")
 
 
 var app = express();
+
+require("./config/passport")(passport);
 
 
 //================================================
 // Don't know if I need this or not
 
 // required for passport session
-app.use(session({
-  secret: 'secrettexthere',
-  saveUninitialized: true,
-  resave: true,
+// app.use(session({
+//   secret: 'secrettexthere',
+//   saveUninitialized: true,
+//   resave: true,
 
-}));
+// }));
 
-// Init passport authentication 
-app.use(passport.initialize());
-// persistent login sessions 
-app.use(passport.session());
+// // Init passport authentication 
+// app.use(passport.initialize());
+// // persistent login sessions 
+// app.use(passport.session());
 
 //================================================
 
@@ -43,7 +45,6 @@ app.set("port", process.env.PORT || 3000);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-
 mongoose.connect(configDB.url);
 // Make sure connection to db is working
 var db = mongoose.connection;
@@ -59,58 +60,58 @@ app.get("/users", function(req, res){
 		if(err)
 		{
 			console.log(err);
-			res.send(404);
+			res.status(404);
 			res.json({error: "Finding failed."});
 		}
 		else
 		{
-			res.send(200);
+			res.status(200);
 			res.send(users);
 		}
 	});
 });
 
-passport.use(new FacebookTokenStrategy({
-        clientID: configAuth.facebookAuth.clientID,
-        clientSecret: configAuth.facebookAuth.clientSecret,
-    }, function(accessToken, refreshToken, profile, done) {
-        console.log(profile);
-            User.findOne({"facebook.fbID": profile.id}, function(err, user){
-    			if(err)
-    			{
-    				res.send(500);
-    				return done(err);
-    			}
-    			if(user)
-    			{
-    				res.send(200);
-    				return done(null, user);
-    			}
-    			else {
-    				var newUser = new User();
-    				newUser.facebook.fbID = profile.id;
-    				newUser.facebook.fbToken = accessToken;
-    				newUser.firstName = profile.name.givenName;
-    				newUser.lastName = profile.name.familyName;
-    				newUser.facebook.email = profile.displayName;
-    				newUser.points = 0;
-    				newUser.save(function(err){
-    					if(err)
-    					{
-    						res.send(500);
-    						throw err;
-    					}
-    					res.send(201);
-    					return done(null, newUser);
-    				})
-    			}
-    		});
-    })
-);
+// passport.use(new FacebookTokenStrategy({
+//         clientID: configAuth.facebookAuth.clientID,
+//         clientSecret: configAuth.facebookAuth.clientSecret,
+//     }, function(accessToken, refreshToken, profile, done) {
+//         console.log(profile);
+//             User.findOne({"facebook.id": profile.id}, function(err, user){
+//     			if(err)
+//     			{
+//     				res.status(500);
+//     				return done(err);
+//     			}
+//     			if(user)
+//     			{
+//     				res.status(200);
+//     				return done(null, user);
+//     			}
+//     			else {
+//     				var newUser = new User();
+//     				newUser.facebook.id = profile.id;
+//     				newUser.facebook.fbToken = accessToken;
+//     				newUser.firstName = profile.name.givenName;
+//     				newUser.lastName = profile.name.familyName;
+//     				newUser.facebook.email = profile.displayName;
+//     				newUser.points = 0;
+//     				newUser.save(function(err){
+//     					if(err)
+//     					{
+//     						res.status(500);
+//     						throw err;
+//     					}
+//     					res.status(201);
+//     					return done(null, newUser);
+//     				})
+//     			}
+//     		});
+//     })
+// );
 
 app.post("/login/facebook", passport.authenticate("facebook-token", {session: false}), function(req, res) {
     // Congratulations, you're authenticated!
-    res.send(200);
+    res.status(200);
     return res.json({status: "OK"});
 });
 
@@ -130,12 +131,12 @@ app.get("/points/:id", function(req, res){
 		if(err)
 		{
 			console.log(err);
-			res.send(404);
+			res.status(404);
 			res.json({error: "Finding failed."});
 		}
 		else
 		{
-			res.send(200);
+			res.status(200);
 			res.send(user.points.toString());
 		}
 	});
@@ -143,6 +144,8 @@ app.get("/points/:id", function(req, res){
 
 http.createServer(app).listen(app.get("port"), function(){
   console.log("Bastobe server listening on port " + app.get("port"));
+  console.log(configDB.url);
+
 });
 
 
@@ -154,7 +157,7 @@ app.post("/users", function(req, res){
 	{
 		var newUser = {
 			facebook:{
-				fbID: req.body.fb_id,
+				id: req.body.fb_id,
 				email: req.body.email,
 				accessToken: "DeveloperMode"
 			},
@@ -166,16 +169,16 @@ app.post("/users", function(req, res){
 		User.create(newUser, function(err, newCreation){
 			if(err)
 			{
-				res.send(500);
+				res.status(500);
 				res.json({error: "Creation failed."});
 				console.log(err);
 			} 
 			else
 			{
-				res.send(201);
+				res.status(201);
 				res.json(newCreation);
 				// res.json({_id: newCreation._id, 
-				// 	fbID: req.body.fb_id,
+				// 	id: req.body.fb_id,
 				// 	email: req.body.email,
 				// 	firstName: req.body.first_name,
 				// 	lastName: req.body.last_name,
