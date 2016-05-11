@@ -170,7 +170,7 @@ app.get('/points/:id', middlewareObj.isLoggedIn, function(req, res){
 		}
 		else
 		{
-			res.send(user.points);
+			res.send(user);
 		}
 	});
 });
