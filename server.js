@@ -5,8 +5,24 @@ var FacebookTokenStrategy = require('passport-facebook-token');
 var http = require('http');
 var url = require('url')
 var bodyParser = require("body-parser");
+var session = require("express-session");
+
+
 
 var app = express();
+
+// required for passport session
+app.use(session({
+  secret: 'secrettexthere',
+  saveUninitialized: true,
+  resave: true,
+
+}));
+
+// Init passport authentication 
+app.use(passport.initialize());
+// persistent login sessions 
+app.use(passport.session());
 
 
 app.set('port', process.env.PORT || 3000);
