@@ -11,7 +11,7 @@ var app = express();
 
 var passport = require("passport");
 var FacebookTokenStrategy = require("passport-facebook-token");
-require("./config/passport")(passport);
+//require("./config/passport")(passport);
 
 var http = require("http");
 var url = require("url");
@@ -67,6 +67,44 @@ app.get("/users", function(req, res){
 		}
 	});
 });
+
+passport.use(new FacebookTokenStrategy({
+        clientID: configAuth.facebookAuth.clientID,
+        clientSecret: configAuth.facebookAuth.clientSecret,
+    }, function(accessToken, refreshToken, profile, done) {
+        console.log(profile);
+            User.findOne({"facebook.id": profile.id}, function(err, user){
+    			if(err)
+    			{
+    				res.status(500);
+    				return done(err);
+    			}
+    			if(user)
+    			{
+    				res.status(200);
+    				return done(null, user);
+    			}
+    			else {
+    				var newUser = new User();
+    				newUser.facebook.id = profile.id;
+    				//newUser.facebook.accessToken = accessToken;
+    				newUser.firstName = profile.name.givenName;
+    				newUser.lastName = profile.name.familyName;
+    				newUser.facebook.email = profile.displayName;
+    				newUser.points = 0;
+    				newUser.save(function(err){
+    					if(err)
+    					{
+    						res.status(500);
+    						throw err;
+    					}
+    					res.status(201);
+    					return done(null, newUser);
+    				})
+    			}
+    		});
+    })
+);
 
 app.post("/login/facebook", passport.authenticate("facebook-token", {session: false}), function(req, res) {
     // Authenticated!

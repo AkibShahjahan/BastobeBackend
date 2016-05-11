@@ -12,12 +12,12 @@ module.exports = function(passport){
             User.findOne({"facebook.id": profile.id}, function(err, user){
     			if(err)
     			{
-    				res.send(500);
+    				res.status(500);
     				return done(err);
     			}
     			if(user)
     			{
-    				res.send(200);
+    				res.status(200);
     				return done(null, user);
     			}
     			else {
