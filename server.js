@@ -48,7 +48,7 @@ var userSchema = new mongoose.Schema({
 		lastName: String, 
 		email: String,
 		token: String
-	}
+	},
 	points: Number,
 })
 var User = mongoose.model("User", userSchema);
