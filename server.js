@@ -50,10 +50,12 @@ passport.use(new FacebookTokenStrategy({
             User.findOne({'facebook.id': profile.id}, function(err, user){
     			if(err)
     			{
+    				res.status(500);
     				return done(err);
     			}
     			if(user)
     			{
+    				res.status(200);
     				return done(null, user);
     			}
     			else {
