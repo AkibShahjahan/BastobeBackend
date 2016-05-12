@@ -3,12 +3,12 @@ var mongoose = require("mongoose");
 var userSchema = new mongoose.Schema({
 	facebook: {
 		id: String,
+		firstName: String, 
+		lastName: String, 
 		email: String,
-		accessToken: String
+		token: String
 	},
-	firstName: String, 
-	lastName: String,
-	points: Number
+	points: Number,
 })
 
 var User = mongoose.model("User", userSchema);

@@ -14,44 +14,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-
-// // required for passport session
-// app.use(session({
-//   secret: 'secrettexthere',
-//   saveUninitialized: true,
-//   resave: true,
-
-// }));
-
-// // Init passport authentication 
-// app.use(passport.initialize());
-// // persistent login sessions 
-// app.use(passport.session());
-
+var User = require("./models/user");
+var configAuth = require("./config/auth");
+var configDB = require("./config/database")
 
 app.set('port', process.env.PORT || 8080);
 
 
 var mongoose = require('mongoose');
-mongoose.connect("mongodb://akib:rusty@ds019101.mlab.com:19101/bastobe-db");
+mongoose.connect(configDB.url);
 // Make sure connection to db is working
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
    console.log('Successfully mongodb is connected');
 });
-
-var userSchema = new mongoose.Schema({
-	facebook: {
-		id: String,
-		firstName: String, 
-		lastName: String, 
-		email: String,
-		token: String
-	},
-	points: Number,
-})
-var User = mongoose.model("User", userSchema);
 
 
 app.get('/users', function(req, res){
@@ -71,8 +48,8 @@ app.get('/users', function(req, res){
 
 
 passport.use(new FacebookTokenStrategy({
-        clientID: '1541173709535196',
-        clientSecret: '9cfe46bb94433454454a281b0b4aba4d',
+        clientID: configAuth.facebookAuth.clientID,
+        clientSecret: configAuth.facebookAuth.clientSecret,
     }, function(accessToken, refreshToken, profile, done) {
         console.log(profile);
                     // Do stuff with the profile. You're already getting authenticated data so there's no need to double check anything! For example
