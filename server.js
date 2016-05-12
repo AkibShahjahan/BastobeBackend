@@ -127,6 +127,10 @@ app.get('/points/:id', function(req, res){
 	});
 });
 
+app.get("/logout", function(req, res){
+	req.logout();
+})
+
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Bastobe server listening on port " + app.get('port'));
