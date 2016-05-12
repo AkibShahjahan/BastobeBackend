@@ -134,6 +134,7 @@ http.createServer(app).listen(app.get('port'), function(){
 
 // FOR DEVELOPMENT PURPOSES ===================================================
 
+
 var middlewareObj = {};
 middlewareObj.isLoggedIn = function(req, res, next){
 	if(req.isAuthenticated())
