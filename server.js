@@ -8,18 +8,15 @@ var http = require('http');
 var url = require('url');
 var session = require("express-session");
 
-
 var bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-
 
 var User = require("./models/user");
 var configAuth = require("./config/auth");
 var configDB = require("./config/database")
 
 app.set('port', process.env.PORT || 8080);
-
 
 var mongoose = require('mongoose');
 mongoose.connect(configDB.url);
@@ -29,7 +26,6 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function callback () {
    console.log('Successfully mongodb is connected');
 });
-
 
 app.get('/users', function(req, res){
 	User.find({}, function(err, users){
@@ -45,8 +41,6 @@ app.get('/users', function(req, res){
 	});
 });
 
-
-
 passport.use(new FacebookTokenStrategy({
         clientID: configAuth.facebookAuth.clientID,
         clientSecret: configAuth.facebookAuth.clientSecret,
@@ -56,13 +50,12 @@ passport.use(new FacebookTokenStrategy({
             User.findOne({'facebook.id': profile.id}, function(err, user){
     			if(err)
     			{
-    				console.log("hello");
+    				res.status(500);
     				return done(err);
     			}
     			if(user)
     			{
-    				console.log("hello2");
-
+    				res.status(200);
     				return done(null, user);
     			}
     			else {
@@ -74,11 +67,13 @@ passport.use(new FacebookTokenStrategy({
     				newUser.facebook.email = profile.displayName;
     				newUser.points = 1;
     				newUser.save(function(err){
-    					if(err)
+    					if(err){
+    						res.status(500);
     						throw err;
+    					}
+    					res.status(201)
     					return done(null, newUser);
     				})
-    				console.log(profile);
     			}
     		});
     })
@@ -86,27 +81,28 @@ passport.use(new FacebookTokenStrategy({
 
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!
-    console.log("LOGGED");
+    res.status(200)
     return res.json({status: 'OK'});
 });
-
 
 app.get('/points/:id', function(req, res){
 	User.findById(req.params.id, function(err, user){
 		if(err)
 		{
-			console.log(err);
+			//console.log(err);
+			res.status(400);
 			res.json({error: "Finding failed."});
 		}
 		else
 		{
-
+			res.status(200);
 			res.send(user.points.toString());
 		}
 	});
 });
 
 app.get("/logout", function(req, res){
+	res.status(200);
 	req.logout();
 })
 
