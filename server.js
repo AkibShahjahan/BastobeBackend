@@ -76,7 +76,7 @@ passport.use(new FacebookTokenStrategy({
     }, function(accessToken, refreshToken, profile, done) {
         console.log(profile);
                     // Do stuff with the profile. You're already getting authenticated data so there's no need to double check anything! For example
-            User.findOne({'fbID': profile.id}, function(err, user){
+            User.findOne({'facebook.id': profile.id}, function(err, user){
     			if(err)
     			{
     				console.log("hello");
