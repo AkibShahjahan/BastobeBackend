@@ -42,14 +42,12 @@ db.once('open', function callback () {
 });
 
 var userSchema = new mongoose.Schema({
-	facebook: {
-		id: String,
-		email: String,
-		accessToken: String,
-		firstName: String, 
-		lastName: String
-	},
-	points: Number
+	fbID: String,
+	email: String,
+	firstName: String, 
+	lastName: String,
+	points: Number,
+	fbToken: String
 })
 var User = mongoose.model("User", userSchema);
 
@@ -90,11 +88,11 @@ passport.use(new FacebookTokenStrategy({
     			}
     			else {
     				var newUser = new User();
-    				newUser.facebook.id = profile.id;
-    				newUser.facebook.accessToken = accessToken;
-    				newUser.facebook.firstName = profile.name.givenName;
-    				newUser.facebook.lastName = profile.name.familyName;
-    				newUser.facebook.email = profile.displayName;
+    				newUser.fbID = profile.id;
+    				newUser.fbToken = accessToken;
+    				newUser.firstName = profile.name.givenName;
+    				newUser.lastName = profile.name.familyName;
+    				newUser.email = profile.displayName;
     				newUser.points = 1;
     				newUser.save(function(err){
     					if(err)
@@ -150,13 +148,10 @@ app.post("/users", function(req, res){
 		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email"))
 	{
 		var newUser = {
-			facebook: {
-				id: req.body.fb_id,
-				email: req.body.email,
-				firstName: req.body.first_name,
-				lastName: req.body.last_name,
-				accessToken: "DeveloperMode"
-			},
+			fbID: req.body.fb_id,
+			email: req.body.email,
+			firstName: req.body.first_name,
+			lastName: req.body.last_name,
 			points: 0
 		};
 
@@ -168,7 +163,13 @@ app.post("/users", function(req, res){
 			} 
 			else
 			{
-				res.json(newCreation);
+				res.json({_id: newCreation._id, 
+					fbID: req.body.fb_id,
+					email: req.body.email,
+					firstName: req.body.first_name,
+					lastName: req.body.last_name,
+					points: 0
+				});
 			}
 		});
 	}
