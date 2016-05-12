@@ -50,12 +50,12 @@ passport.use(new FacebookTokenStrategy({
             User.findOne({'facebook.id': profile.id}, function(err, user){
     			if(err)
     			{
-    				res.status(500);
+    				//res.status(500);
     				return done(err);
     			}
     			if(user)
     			{
-    				res.status(200);
+    				//res.status(200);
     				return done(null, user);
     			}
     			else {
@@ -68,10 +68,10 @@ passport.use(new FacebookTokenStrategy({
     				newUser.points = 1;
     				newUser.save(function(err){
     					if(err){
-    						res.status(500);
+    						//res.status(500);
     						throw err;
     					}
-    					res.status(201)
+    					//res.status(201)
     					return done(null, newUser);
     				})
     			}
