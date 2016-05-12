@@ -28,19 +28,23 @@ db.once('open', function callback () {
    console.log('Successfully mongodb is connected');
 });
 
-app.get('/users', function(req, res){
-	User.find({}, function(err, users){
-		if(err)
-		{
-			console.log(err);
-			res.json({error: "Finding failed."});
-		}
-		else
-		{
-			res.send(users);
-		}
-	});
-});
+var userRoutes = require("./controllers/users");
+app.use("/users", userRoutes);
+
+
+// app.get('/users', function(req, res){
+// 	User.find({}, function(err, users){
+// 		if(err)
+// 		{
+// 			console.log(err);
+// 			res.json({error: "Finding failed."});
+// 		}
+// 		else
+// 		{
+// 			res.send(users);
+// 		}
+// 	});
+// });
 
 
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
@@ -87,62 +91,62 @@ middlewareObj.isLoggedIn = function(req, res, next){
 	res.send({error: "You are unauthenticated."});
 }
 
-app.post("/users", function(req, res){
-	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") && 
-		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email"))
-	{
-		var newUser = {
-			fbID: req.body.fb_id,
-			email: req.body.email,
-			firstName: req.body.first_name,
-			lastName: req.body.last_name,
-			points: 0
-		};
+// app.post("/users", function(req, res){
+// 	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") && 
+// 		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email"))
+// 	{
+// 		var newUser = {
+// 			fbID: req.body.fb_id,
+// 			email: req.body.email,
+// 			firstName: req.body.first_name,
+// 			lastName: req.body.last_name,
+// 			points: 0
+// 		};
 
-		User.create(newUser, function(err, newCreation){
-			if(err)
-			{
-				res.json({error: "Creation failed."});
-				console.log(err);
-			} 
-			else
-			{
-				res.json({_id: newCreation._id, 
-					fbID: req.body.fb_id,
-					email: req.body.email,
-					firstName: req.body.first_name,
-					lastName: req.body.last_name,
-					points: 0
-				});
-			}
-		});
-	}
-	else
-	{
-		res.status(400);
-		res.json({error: "The POST request must have 'fb_id', 'email', 'first_name', and 'last_name' keys."})
-	}
-});
+// 		User.create(newUser, function(err, newCreation){
+// 			if(err)
+// 			{
+// 				res.json({error: "Creation failed."});
+// 				console.log(err);
+// 			} 
+// 			else
+// 			{
+// 				res.json({_id: newCreation._id, 
+// 					fbID: req.body.fb_id,
+// 					email: req.body.email,
+// 					firstName: req.body.first_name,
+// 					lastName: req.body.last_name,
+// 					points: 0
+// 				});
+// 			}
+// 		});
+// 	}
+// 	else
+// 	{
+// 		res.status(400);
+// 		res.json({error: "The POST request must have 'fb_id', 'email', 'first_name', and 'last_name' keys."})
+// 	}
+// });
 
 
-// for testing purposes ONLY
-app.delete("/users/:id", function(req, res){
-	User.findById(req.params.id, function(err, user){
-		if(!user)
-		{
-			res.status(404);
-			res.json({error: "No user with that object id"});
-		}
-		user.remove(function(err){
-			if(err)
-			{
-				res.json({error: "Deletion failed."});
-				console.log(err);
-			}
-			else
-			{
-				res.json({success: "User deleted"});
-			}
-		});
-	});
-});
+// // for testing purposes ONLY
+// app.delete("/users/:id", function(req, res){
+// 	User.findById(req.params.id, function(err, user){
+// 		if(!user)
+// 		{
+// 			res.status(404);
+// 			res.json({error: "No user with that object id"});
+// 		}
+// 		user.remove(function(err){
+// 			if(err)
+// 			{
+// 				res.json({error: "Deletion failed."});
+// 				console.log(err);
+// 			}
+// 			else
+// 			{
+// 				res.json({success: "User deleted"});
+// 			}
+// 		});
+// 	});
+// });
