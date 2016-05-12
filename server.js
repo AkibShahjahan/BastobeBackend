@@ -1,164 +1,75 @@
-//===============================
-// TODO:
-	// disribute the files, organize
-	// shelf isAuthenticate()
-//===============================
-
-
-
-var express = require("express");
-var app = express();
-
-var passport = require("passport");
-var FacebookTokenStrategy = require("passport-facebook-token");
-//require("./config/passport")(passport);
-
-var http = require("http");
-var url = require("url");
+var express = require('express');
+var mongoose = require('mongoose');
+var passport = require('passport');
+var FacebookTokenStrategy = require('passport-facebook-token');
+var http = require('http');
+var url = require('url')
+var bodyParser = require("body-parser");
 var session = require("express-session");
 
-var bodyParser = require("body-parser");
+
+
+var app = express();
+
+// // required for passport session
+// app.use(session({
+//   secret: 'secrettexthere',
+//   saveUninitialized: true,
+//   resave: true,
+
+// }));
+
+// // Init passport authentication 
+// app.use(passport.initialize());
+// // persistent login sessions 
+// app.use(passport.session());
+
+
+app.set('port', process.env.PORT || 8080);
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-var User = require("./models/user");
-var configAuth = require("./config/auth");
-var configDB = require("./config/database")
-
-var mongoose = require("mongoose");
-mongoose.connect(configDB.url);
+mongoose.connect("mongodb://akib:rusty@ds019101.mlab.com:19101/bastobe-db");
 // Make sure connection to db is working
 var db = mongoose.connection;
-db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", function callback () {
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function callback () {
    console.log('Successfully mongodb is connected');
 });
 
-app.set("port", process.env.PORT || 3000);
+var userSchema = new mongoose.Schema({
+	fbID: String,
+	email: String,
+	firstName: String, 
+	lastName: String,
+	points: Number,
+	fbToken: String
+})
+var User = mongoose.model("User", userSchema);
 
-//================================================
-// Don't know if I need this or not
 
-// required for passport session
-app.use(session({
-  secret: 'secrettexthere',
-  saveUninitialized: true,
-  resave: true,
-
-}));
-
-// // Init passport authentication 
- app.use(passport.initialize());
-// // persistent login sessions 
-//================================================
-
-app.get("/users", function(req, res){
+app.get('/users', function(req, res){
 	User.find({}, function(err, users){
 		if(err)
 		{
 			console.log(err);
-			res.status(404);
 			res.json({error: "Finding failed."});
 		}
 		else
 		{
-			res.status(200);
 			res.send(users);
 		}
 	});
 });
-
-passport.use(new FacebookTokenStrategy({
-        clientID: configAuth.facebookAuth.clientID,
-        clientSecret: configAuth.facebookAuth.clientSecret,
-    }, function(accessToken, refreshToken, profile, done) {
-        console.log(profile);
-            User.findOne({"facebook.id": profile.id}, function(err, user){
-    			if(err)
-    			{
-    				//res.status(500);
-    				return done(err);
-    			}
-    			if(user)
-    			{
-    				//res.status(200);
-    				return done(null, user);
-    			}
-    			else {
-    				var newUser = new User();
-    				newUser.facebook.id = profile.id;
-    				newUser.facebook.accessToken = accessToken;
-    				newUser.firstName = profile.name.givenName;
-    				newUser.lastName = profile.name.familyName;
-    				newUser.facebook.email = profile.displayName;
-    				newUser.points = 0;
-    				newUser.save(function(err){
-    					if(err)
-    					{
-    						//res.status(500);
-    						throw err;
-    					}
-    					//res.status(201);
-    					return done(null, newUser);
-    				})
-    			}
-    		});
-    })
-);
-
-app.post("/login/facebook", passport.authenticate("facebook-token", {session: false}), function(req, res) {
-    // Authenticated!
-    // res.status(200);
-    return res.json({status: "OK"});
-});
-
-app.get("/points/:id", function(req, res){
-	User.findById(req.params.id, function(err, user){
-		if(err)
-		{
-			console.log(err);
-			res.status(404);
-			res.json({error: "Finding failed."});
-		}
-		else
-		{
-			res.status(200);
-			res.send(user.points.toString());
-		}
-	});
-});
-
-
-http.createServer(app).listen(app.get("port"), function(){
-  console.log("Bastobe server listening on port " + app.get("port"));
-  console.log(configDB.url);
-
-});
-
-
-// FOR DEVELOPMENT PURPOSES ===================================================
-
-var middlewareObj = {};
-middlewareObj.isLoggedIn = function(req, res, next){
-	if(req.isAuthenticated())
-	{
-		return next();
-	}
-	res.status(401);
-	res.send({error: "You are unauthenticated."});
-}
-
 
 app.post("/users", function(req, res){
 	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") && 
 		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email"))
 	{
 		var newUser = {
-			facebook:{
-				id: req.body.fb_id,
-				email: req.body.email,
-				accessToken: "DeveloperMode"
-			},
+			fbID: req.body.fb_id,
+			email: req.body.email,
 			firstName: req.body.first_name,
 			lastName: req.body.last_name,
 			points: 0
@@ -167,21 +78,18 @@ app.post("/users", function(req, res){
 		User.create(newUser, function(err, newCreation){
 			if(err)
 			{
-				res.status(500);
 				res.json({error: "Creation failed."});
 				console.log(err);
 			} 
 			else
 			{
-				res.status(201);
-				res.json(newCreation);
-				// res.json({_id: newCreation._id, 
-				// 	id: req.body.fb_id,
-				// 	email: req.body.email,
-				// 	firstName: req.body.first_name,
-				// 	lastName: req.body.last_name,
-				// 	points: 0
-				// });
+				res.json({_id: newCreation._id, 
+					fbID: req.body.fb_id,
+					email: req.body.email,
+					firstName: req.body.first_name,
+					lastName: req.body.last_name,
+					points: 0
+				});
 			}
 		});
 	}
@@ -192,6 +100,8 @@ app.post("/users", function(req, res){
 	}
 });
 
+
+// for testing purposes ONLY
 app.delete("/users/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
 		if(!user)
@@ -200,17 +110,94 @@ app.delete("/users/:id", function(req, res){
 			res.json({error: "No user with that object id"});
 		}
 		user.remove(function(err){
-			if(err) 
+			if(err)
 			{
-				res.status(500);
 				res.json({error: "Deletion failed."});
 				console.log(err);
 			}
 			else
 			{
-				res.status(200);
 				res.json({success: "User deleted"});
 			}
 		});
 	});
+});
+
+
+passport.use(new FacebookTokenStrategy({
+        clientID: '1541173709535196',
+        clientSecret: '9cfe46bb94433454454a281b0b4aba4d',
+    }, function(accessToken, refreshToken, profile, done) {
+        console.log(profile);
+                    // Do stuff with the profile. You're already getting authenticated data so there's no need to double check anything! For example
+            User.findOne({'fbID': profile.id}, function(err, user){
+    			if(err)
+    			{
+    				console.log("hello");
+    				return done(err);
+    			}
+    			if(user)
+    			{
+    				console.log("hello2");
+
+    				return done(null, user);
+    			}
+    			else {
+    				var newUser = new User();
+    				newUser.fbID = profile.id;
+    				newUser.fbToken = accessToken;
+    				newUser.firstName = profile.name.givenName;
+    				newUser.lastName = profile.name.familyName;
+    				newUser.email = profile.displayName;
+    				newUser.points = 1;
+    				newUser.save(function(err){
+    					if(err)
+    						throw err;
+    					return done(null, newUser);
+    				})
+    				console.log(profile);
+    			}
+    		});
+    })
+);
+
+app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
+    // Congratulations, you're authenticated!
+    console.log("LOGGED");
+    return res.json({status: 'OK'});
+});
+
+
+var middlewareObj = {};
+middlewareObj.isLoggedIn = function(req, res, next){
+	if(req.isAuthenticated())
+	{
+		return next();
+	}
+	res.send({error: "You are unauthenticated."});
+}
+
+app.get('/points/:id', middlewareObj.isLoggedIn, function(req, res){
+	User.findById(req.params.id, function(err, user){
+		if(err)
+		{
+			console.log(err);
+			res.json({error: "Finding failed."});
+		}
+		else
+		{
+
+			res.send(user.points.toString());
+		}
+	});
+});
+
+// app.listen(3000, function () {
+//   console.log("Bastobe server listening on port 3000!");
+// });
+
+
+
+http.createServer(app).listen(app.get('port'), function(){
+  console.log("Bastobe server listening on port " + app.get('port'));
 });
