@@ -42,12 +42,14 @@ db.once('open', function callback () {
 });
 
 var userSchema = new mongoose.Schema({
-	fbID: String,
-	email: String,
-	firstName: String, 
-	lastName: String,
+	facebook: {
+		id: String,
+		firstName: String, 
+		lastName: String, 
+		email: String,
+		token: String
+	}
 	points: Number,
-	fbToken: String
 })
 var User = mongoose.model("User", userSchema);
 
@@ -88,11 +90,11 @@ passport.use(new FacebookTokenStrategy({
     			}
     			else {
     				var newUser = new User();
-    				newUser.fbID = profile.id;
-    				newUser.fbToken = accessToken;
-    				newUser.firstName = profile.name.givenName;
-    				newUser.lastName = profile.name.familyName;
-    				newUser.email = profile.displayName;
+    				newUser.facebook.id = profile.id;
+    				newUser.facebook.token = accessToken;
+    				newUser.facebook.firstName = profile.name.givenName;
+    				newUser.facebook.lastName = profile.name.familyName;
+    				newUser.facebook.email = profile.displayName;
     				newUser.points = 1;
     				newUser.save(function(err){
     					if(err)
