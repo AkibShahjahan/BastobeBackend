@@ -30,10 +30,41 @@ router.get("/:id", function(req, res){
 			res.send(user);
 		}
 	});
-})
+});
 
+router.get('/:id/points', function(req, res){
+	User.findById(req.params.id, function(err, user){
+		if(err)
+		{
+			//console.log(err);
+			res.status(400);
+			res.json({error: "Finding failed."});
+		}
+		else
+		{
+			res.status(200);
+			res.send(user.points.toString());
+		}
+	});
+});
+
+// router.put(":/id", function(req, res){
+// 	User.findByIdAndUpdate(req.params.id, req.body.user, function(err, updatedUser){
+// 		if(err)
+// 		{
+//
+// 		}
+// 		else
+// 		{
+// 			res.status(200);
+// 		}
+// 	});
+// });
+
+
+// FOR DEVELOPERS ONLY ========================================================
 router.post("/", function(req, res){
-	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") && 
+	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") &&
 		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email"))
 	{
 		var newUser = {
@@ -52,7 +83,7 @@ router.post("/", function(req, res){
 			{
 				res.json({error: "Creation failed."});
 				console.log(err);
-			} 
+			}
 			else
 			{
 				res.json({newCreation});
@@ -66,7 +97,6 @@ router.post("/", function(req, res){
 	}
 });
 
-// for testing purposes ONLY
 router.delete("/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
 		if(!user)

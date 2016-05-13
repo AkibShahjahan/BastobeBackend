@@ -17,7 +17,7 @@ var User = require("./models/user");
 var configAuth = require("./config/auth");
 var configDB = require("./config/database")
 
-app.set('port', process.env.PORT || 8080);
+app.set('port', process.env.PORT || 3000);
 
 var mongoose = require('mongoose');
 mongoose.connect(configDB.url);
@@ -53,21 +53,21 @@ app.post('/login/facebook', passport.authenticate('facebook-token', {session: fa
     return res.json({status: 'OK'});
 });
 
-app.get('/points/:id', function(req, res){
-	User.findById(req.params.id, function(err, user){
-		if(err)
-		{
-			//console.log(err);
-			res.status(400);
-			res.json({error: "Finding failed."});
-		}
-		else
-		{
-			res.status(200);
-			res.send(user.points.toString());
-		}
-	});
-});
+// app.get('/points/:id', function(req, res){
+// 	User.findById(req.params.id, function(err, user){
+// 		if(err)
+// 		{
+// 			//console.log(err);
+// 			res.status(400);
+// 			res.json({error: "Finding failed."});
+// 		}
+// 		else
+// 		{
+// 			res.status(200);
+// 			res.send(user.points.toString());
+// 		}
+// 	});
+// });
 
 app.get("/logout", function(req, res){
 	res.status(200);
@@ -92,7 +92,7 @@ middlewareObj.isLoggedIn = function(req, res, next){
 }
 
 // app.post("/users", function(req, res){
-// 	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") && 
+// 	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") &&
 // 		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email"))
 // 	{
 // 		var newUser = {
@@ -108,10 +108,10 @@ middlewareObj.isLoggedIn = function(req, res, next){
 // 			{
 // 				res.json({error: "Creation failed."});
 // 				console.log(err);
-// 			} 
+// 			}
 // 			else
 // 			{
-// 				res.json({_id: newCreation._id, 
+// 				res.json({_id: newCreation._id,
 // 					fbID: req.body.fb_id,
 // 					email: req.body.email,
 // 					firstName: req.body.first_name,
