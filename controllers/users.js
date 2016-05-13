@@ -48,18 +48,38 @@ router.get('/:id/points', function(req, res){
 	});
 });
 
-// router.put(":/id", function(req, res){
-// 	User.findByIdAndUpdate(req.params.id, req.body.user, function(err, updatedUser){
-// 		if(err)
-// 		{
-//
-// 		}
-// 		else
-// 		{
-// 			res.status(200);
-// 		}
-// 	});
-// });
+router.put("/:id/points", function(req, res){
+	if(req.body.hasOwnProperty("newPoints"))
+	{
+		User.findById(req.params.id, function(err, user){
+			if(err)
+			{
+				// do something
+			}
+			else {
+				var modifiedUser = {
+					facebook: {
+						id: user.facebook.id,
+						email: user.facebook.email,
+						firstName: user.facebook.firstName,
+						lastName: user.facebook.lastName
+					},
+					points: Number(req.body.newPoints)
+				};
+				User.findByIdAndUpdate(req.params.id, modifiedUser, function(err, updatedUser){
+					if(err)
+					{
+						// do something
+					}
+					else {
+						res.status(200);
+						res.send(modifiedUser);
+					}
+				})
+			}
+		})
+	}
+});
 
 
 // FOR DEVELOPERS ONLY ========================================================
