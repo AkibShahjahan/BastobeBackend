@@ -48,8 +48,8 @@ router.get('/:id/points', function(req, res){
 	});
 });
 
-router.get("/:fb_id/id", function(req, res){
-	User.findOne({"facebook.id": req.params.fb_id}, function(err, user){
+router.get("/:fbId/id", function(req, res){
+	User.findOne({"facebook.id": req.params.fbId}, function(err, user){
 		if(err || !user)
 		{
 			res.status(400);
@@ -57,7 +57,7 @@ router.get("/:fb_id/id", function(req, res){
 		}
 		else {
 			res.status(200);
-			res.send(user._id.toString());
+			res.send(user._id);
 		}
 	});
 });
