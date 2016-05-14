@@ -56,7 +56,7 @@ router.get("/:fb_id/id", function(req, res){
 			res.json({error: "Finding failed"});
 		}
 		else {
-			//res.status(200);
+			res.status(200);
 			res.send(user._id);
 		}
 	})
