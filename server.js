@@ -49,7 +49,7 @@ app.use("/users", userRoutes);
 
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!
-    //res.status(200)
+    res.status(200)
     return res.json({status: 'OK'});
 });
 
