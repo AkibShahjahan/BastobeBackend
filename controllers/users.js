@@ -26,7 +26,7 @@ router.get("/:id", function(req, res){
 		}
 		else
 		{
-			//res.status(200);
+			res.status(200);
 			res.send(user);
 		}
 	});
