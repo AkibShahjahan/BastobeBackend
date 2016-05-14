@@ -57,10 +57,10 @@ router.get("/:fb_id/id", function(req, res){
 		}
 		else {
 			res.status(200);
-			res.send(user._id);
+			res.send(user._id.toString());
 		}
-	})
-})
+	});
+});
 
 router.put("/:id/points", function(req, res){
 	if(req.body.hasOwnProperty("newPoints"))
