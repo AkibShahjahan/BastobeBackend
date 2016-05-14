@@ -50,7 +50,7 @@ router.get('/:id/points', function(req, res){
 
 router.get("/:fb_id/id", function(req, res){
 	User.findOne({"facebook.id": req.params.fb_id}, function(err, user){
-		if(err)
+		if(err || !user)
 		{
 			res.status(400);
 			res.json({error: "Finding failed"});
