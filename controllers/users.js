@@ -57,7 +57,7 @@ router.get("/:fbId/id", function(req, res){
 		}
 		else {
 			res.status(200);
-			res.send(user._id);
+			res.send((user._id).toString());
 		}
 	});
 });
