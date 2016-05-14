@@ -29,7 +29,10 @@ db.once('open', function callback () {
 });
 
 var userRoutes = require("./controllers/users");
+var mediaRoutes = require("./controllers/medias");
+
 app.use("/users", userRoutes);
+app.use("/medias", mediaRoutes);
 
 
 // app.get('/users', function(req, res){
