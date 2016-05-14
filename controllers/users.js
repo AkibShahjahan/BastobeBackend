@@ -42,11 +42,25 @@ router.get('/:id/points', function(req, res){
 		}
 		else
 		{
-			res.status(200);
+			//res.status(200);
 			res.send(user.points.toString());
 		}
 	});
 });
+
+router.get("/:fb_id", function(req, res){
+	User.findOne({"facebook.id": req.params.fb_id}, function(err, user){
+		if(err)
+		{
+			res.status(400);
+			res.json({error: "Finding failed"});
+		}
+		else {
+			res.status(200);
+			res.send(user._id);
+		}
+	})
+})
 
 router.put("/:id/points", function(req, res){
 	if(req.body.hasOwnProperty("newPoints"))
