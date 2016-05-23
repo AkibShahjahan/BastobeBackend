@@ -34,11 +34,27 @@ router.get("/:id", function(req, res){
 
 
 router.post("/", function(req, res){
-	if(req.body.hasOwnProperty("creator_id") && req.body.hasOwnProperty("data_source"))
+	if(req.body.hasOwnProperty("creator_id") && req.body.hasOwnProperty("caption_label")
+	&& req.body.hasOwnProperty("author") && req.body.hasOwnProperty("cord_x")
+	&& req.body.hasOwnProperty("cord_y"))
 	{
+		var d = new Date();
+		var currentTime = d.toUTCString();
 		var newMedia = {
 			creatorId: req.body.creator_id,
-      dataSource: req.body.data_source
+			generalInfo: {
+				likes: 0,
+				spread: 0,
+				caption: req.body.caption_label,
+				author: req.body.author
+			},
+			coordinate: {
+				x: req.body.cord_x,
+				y: req.body.cord_y
+			},
+			date: currentTime,
+			// _id doesn't work ---- source: "http://s3.amazonaws.com/bastobe/sample/"+_id+".png",
+			views: 0
 		};
 
 		Media.create(newMedia, function(err, newCreation){
@@ -79,6 +95,36 @@ router.delete("/:id", function(req, res){
 			}
 		});
 	});
+});
+
+router.put("/:id/likes/like", function(req, res){
+	User.findById(req.params.id, function(err, user){
+		if(err)
+		{
+			// do something
+		}
+    else {
+			var modifiedUser = {
+				facebook: {
+					id: user.facebook.id,
+					email: user.facebook.email,
+					firstName: user.facebook.firstName,
+					lastName: user.facebook.lastName
+				},
+				points: user.points+1
+			};
+			User.findByIdAndUpdate(req.params.id, modifiedUser, function(err, updatedUser){
+				if(err)
+				{
+					// do something
+				}
+				else {
+					res.status(200);
+					res.send(modifiedUser);
+				}
+			})
+		}
+	})
 });
 
 module.exports = router;

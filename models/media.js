@@ -1,28 +1,26 @@
 var mongoose = require("mongoose");
 
-// var mediaSchema = new mongoose.Schema({
-//   creatorId: String,
-// 	info: {
-// 		likes: Number,
-// 		shows: Number,
-// 		caption: String,
-// 		author: String,
-// 	},
-//   coordinate: {
-//     x: Number,
-//     y: Number
-//   },
-//   time : {
-//     type : Date,
-//     default: Date.now
-//   }.
-//   source: String
-// });
-
 var mediaSchema = new mongoose.Schema({
   creatorId: String,
-  dataSource: String
+	generalInfo: {
+		likes: Number,
+		spread: Number,
+		caption: String,
+		author: String,
+	},
+  coordinate: {
+    x: Number,
+    y: Number
+  },
+  time : {
+    type : Date,
+    default: Date.now
+  },
+  source: String,
+  views: Number
 });
+
+
 
 var Media = mongoose.model("Media", mediaSchema);
 
