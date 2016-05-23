@@ -38,8 +38,8 @@ router.post("/", function(req, res){
 	&& req.body.hasOwnProperty("author") && req.body.hasOwnProperty("cord_x")
 	&& req.body.hasOwnProperty("cord_y"))
 	{
-		var d = new Date();
-		var currentTime = d.toUTCString();
+		var data= new Date();
+		var currentTime = date.toUTCString();
 		var newMedia = {
 			creatorId: req.body.creator_id,
 			generalInfo: {
@@ -65,7 +65,7 @@ router.post("/", function(req, res){
 			}
 			else
 			{
-				res.json({newCreation});
+				res.json(newCreation);
 			}
 		});
 	}
