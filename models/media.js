@@ -16,7 +16,6 @@ var mediaSchema = new mongoose.Schema({
     type : Date,
     default: Date.now
   },
-  source: String,
   views: Number
 });
 
