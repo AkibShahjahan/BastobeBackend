@@ -65,10 +65,7 @@ router.post("/", function(req, res){
 			}
 			else
 			{
-				res.json({
-					"date": currentTime,
-					"id": newCreation._id
-				});
+				res.send(newCreation._id.toString());
 			}
 		});
 	}
