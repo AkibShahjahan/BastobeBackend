@@ -16,6 +16,46 @@ router.get("/", function(req, res){
 	});
 });
 
+
+
+// =============================================================
+router.delete("/delete", function(req, res){
+	Media.remove({}, function(err, medias){
+		if(!err) {
+			res.json({success: "All entities have been removed."});
+		} else {
+			res.json({error: "Sorry, the deletion was not successful"})
+		}
+	})
+});
+// =============================================================
+
+// global feed
+router.get("/feed/global", function(req, res){
+	 Media.find({}).sort({date: -1}).exec(function(err, medias) {
+		 res.send(medias);
+	 });
+
+
+
+});
+
+// local feed
+router.get("/feed/:x/:y", function(req, res){
+	var x = parseFloat(req.params.x);
+	var y = parseFloat(req.params.y);
+	var rad = 0.02;
+	Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
+									 	{"coordinate.x": {$lt: x + rad}},
+									 	{"coordinate.y": {$gt: y - rad}},
+									 	{"coordinate.y": {$lt: y + rad}}]}).sort({date: -1}).exec(function(err, medias) {
+		res.send(medias);
+	})
+})
+// /feed/x/y
+// /rank/world
+// /rank/x/y
+
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
 		if(err)
@@ -31,6 +71,9 @@ router.get("/:id", function(req, res){
 		}
 	});
 });
+
+
+
 
 
 router.post("/", function(req, res){
@@ -126,5 +169,9 @@ router.put("/:id/likes/like", function(req, res){
 		}
 	})
 });
+
+
+
+
 
 module.exports = router;
