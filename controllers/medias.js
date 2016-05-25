@@ -32,7 +32,7 @@ router.delete("/delete", function(req, res){
 
 // global feed
 router.get("/feed/global", function(req, res){
-	 Media.find({}).sort({date: -1}).exec(function(err, medias) {
+	 Media.find({}).sort({time: -1}).exec(function(err, medias) {
 		 res.send(medias);
 	 });
 
@@ -48,7 +48,7 @@ router.get("/feed/:x/:y", function(req, res){
 	Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
 									 	{"coordinate.x": {$lt: x + rad}},
 									 	{"coordinate.y": {$gt: y - rad}},
-									 	{"coordinate.y": {$lt: y + rad}}]}).sort({date: -1}).exec(function(err, medias) {
+									 	{"coordinate.y": {$lt: y + rad}}]}).sort({time: -1}).exec(function(err, medias) {
 		res.send(medias);
 	})
 })
