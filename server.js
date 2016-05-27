@@ -30,25 +30,11 @@ db.once('open', function callback () {
 
 var userRoutes = require("./controllers/users");
 var mediaRoutes = require("./controllers/medias");
+var pointRoutes = require("./controllers/points");
 
 app.use("/users", userRoutes);
 app.use("/medias", mediaRoutes);
-
-
-// app.get('/users', function(req, res){
-// 	User.find({}, function(err, users){
-// 		if(err)
-// 		{
-// 			console.log(err);
-// 			res.json({error: "Finding failed."});
-// 		}
-// 		else
-// 		{
-// 			res.send(users);
-// 		}
-// 	});
-// });
-
+app.use("/points", pointRoutes);
 
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!

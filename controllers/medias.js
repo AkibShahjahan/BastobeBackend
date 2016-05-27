@@ -4,13 +4,11 @@ var Media = require("../models/media");
 
 router.get("/", function(req, res){
 	Media.find({}, function(err, medias){
-		if(err)
-		{
+		if(err) {
 			console.log(err);
 			res.json({error: "Finding failed."});
 		}
-		else
-		{
+		else {
 			res.send(medias);
 		}
 	});
@@ -35,9 +33,6 @@ router.get("/feed/global", function(req, res){
 	 Media.find({}).sort({time: -1}).exec(function(err, medias) {
 		 res.send(medias);
 	 });
-
-
-
 });
 
 // local feed
@@ -49,7 +44,7 @@ router.get("/feed/:x/:y", function(req, res){
 									 	{"coordinate.x": {$lt: x + rad}},
 									 	{"coordinate.y": {$gt: y - rad}},
 									 	{"coordinate.y": {$lt: y + rad}}]}).sort({time: -1}).exec(function(err, medias) {
-		res.send(medias);
+		res.json(medias);
 	})
 })
 // /feed/x/y
@@ -58,14 +53,11 @@ router.get("/feed/:x/:y", function(req, res){
 
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
-		if(err)
-		{
+		if(err) {
 			//console.log(err);
 			res.status(400);
 			res.json({error: "Finding failed."});
-		}
-		else
-		{
+		} else {
 			res.status(200);
 			res.send(media);
 		}
@@ -73,14 +65,10 @@ router.get("/:id", function(req, res){
 });
 
 
-
-
-
 router.post("/", function(req, res){
 	if(req.body.hasOwnProperty("creator_id") && req.body.hasOwnProperty("caption_label")
 	&& req.body.hasOwnProperty("author") && req.body.hasOwnProperty("cord_x")
-	&& req.body.hasOwnProperty("cord_y"))
-	{
+	&& req.body.hasOwnProperty("cord_y")) {
 		var date= new Date();
 		var currentTime = date.toUTCString();
 		var newMedia = {
@@ -101,19 +89,14 @@ router.post("/", function(req, res){
 		};
 
 		Media.create(newMedia, function(err, newCreation){
-			if(err)
-			{
+			if(err) {
 				res.json({error: "Creation failed."});
 				console.log(err);
-			}
-			else
-			{
+			} else {
 				res.send(newCreation._id.toString());
 			}
 		});
-	}
-	else
-	{
+	} else {
 		res.status(400);
 		res.json({error: "The POST request must have 'creator_id' and 'data_source' keys."})
 	}
@@ -121,19 +104,16 @@ router.post("/", function(req, res){
 
 router.delete("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
-		if(!media)
-		{
+		if(!media) {
 			res.status(404);
 			res.json({error: "No user with that object id"});
 		}
 		media.remove(function(err){
-			if(err)
-			{
+			if(err) {
 				res.json({error: "Deletion failed."});
 				console.log(err);
 			}
-			else
-			{
+			else {
 				res.json({success: "User deleted"});
 			}
 		});
@@ -142,11 +122,10 @@ router.delete("/:id", function(req, res){
 
 router.put("/:id/likes/like", function(req, res){
 	User.findById(req.params.id, function(err, user){
-		if(err)
-		{
-			// do something
-		}
-    else {
+		if(err) {
+			res.status(404);
+			res.json({error: "No user with that object id"});
+		} else {
 			var modifiedUser = {
 				facebook: {
 					id: user.facebook.id,
@@ -157,11 +136,10 @@ router.put("/:id/likes/like", function(req, res){
 				points: user.points+1
 			};
 			User.findByIdAndUpdate(req.params.id, modifiedUser, function(err, updatedUser){
-				if(err)
-				{
-					// do something
-				}
-				else {
+				if(err){
+					res.status(404);
+					res.json({error: "No user with that object id"});
+				} else {
 					res.status(200);
 					res.send(modifiedUser);
 				}
