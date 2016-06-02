@@ -68,7 +68,7 @@ router.get("/:id", function(req, res){
 router.post("/", function(req, res){
 	if(req.body.hasOwnProperty("creator_id") && req.body.hasOwnProperty("caption_label")
 	&& req.body.hasOwnProperty("author") && req.body.hasOwnProperty("cord_x")
-	&& req.body.hasOwnProperty("cord_y")) {
+	&& req.body.hasOwnProperty("cord_y") && req.body.hasOwnProperty("media_type")) {
 		var date= new Date();
 		var currentTime = date.toUTCString();
 		var newMedia = {
@@ -85,7 +85,8 @@ router.post("/", function(req, res){
 			},
 			date: currentTime,
 			// _id doesn't work ---- source: "http://s3.amazonaws.com/bastobe/sample/"+_id+".png",
-			views: 0
+			views: 0,
+			mediaType: req.body.media_type
 		};
 
 		Media.create(newMedia, function(err, newCreation){
