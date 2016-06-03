@@ -153,7 +153,7 @@ router.put("/:id/likes/like", function(req, res){
 
 router.post("/spread", function(req, res){
 	if(req.body.hasOwnProperty("spreader_id") && req.body.hasOwnProperty("media_id")
-	&& req.body.hasOwnProperty("friends_list") && req.body.hasOwnPropery("media_creator_id")){
+	&& req.body.hasOwnProperty("friends_list") && req.body.hasOwnProperty("media_creator_id")){
 		var friendsList = JSON.parse(req.body.friends_list);
 		var friendsListLength = friendsList.length;
 		for(var i = 0; i < friendsListLength; i++) {
