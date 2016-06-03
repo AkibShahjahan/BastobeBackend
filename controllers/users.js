@@ -20,12 +20,11 @@ router.get("/:id", function(req, res){
 		if(user == null) {
 			//console.log(err);
 			res.status(404);
-			res.json({error: "User not found."});
+			res.json({error: "No user with that object id."});
 		} else if(err) {
 			res.status(400);
 			res.json({error: "Finding failed"});
 		} else {
-			console.log("xxxxx");
 			res.status(200);
 			res.send(user);
 		}
@@ -80,7 +79,7 @@ router.delete("/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
 		if(!user) {
 			res.status(404);
-			res.json({error: "No user with that object id"});
+			res.json({error: "No user with that object id."});
 		} else {
 			user.remove(function(err){
 				if(err)
@@ -90,7 +89,7 @@ router.delete("/:id", function(req, res){
 				}
 				else
 				{
-					res.json({success: "User deleted"});
+					res.json({success: "User deleted."});
 				}
 			});
 		}
