@@ -170,12 +170,14 @@ router.post("/spread", function(req, res){
 					// skip this one and move on to the next one
 				}
 			})
-			res.send({success:"Media has been spreaded."});
+			res.send("xo");
+		//	res.send({success:"Media has been spreaded."});
 		}
+		res.send("mm");
 
 	} else {
 		res.status(400);
-		res.send({error:"Media has been xxx."});
+		res.send("damn");
 	//	res.json({error: "The POST request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
 	}
 })
