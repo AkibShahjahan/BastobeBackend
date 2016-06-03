@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router()
 var Media = require("../models/media");
+var User = require("../models/user");
+
 
 router.get("/", function(req, res){
 	Media.find({}, function(err, medias){
@@ -148,6 +150,34 @@ router.put("/:id/likes/like", function(req, res){
 		}
 	})
 });
+
+router.post("/spread", function(req, res){
+	if(req.body.hasOwnProperty("spreader_id") && req.body.hasOwnProperty("media_id")
+	&& req.body.hasOwnProperty("friends_list") && req.body.hasOwnPropery("media_creator_id")){
+		var friendsList = JSON.parse(req.body.friends_list);
+		var friendsListLength = friendsList.length;
+		for(var i = 0; i < friendsListLength; i++) {
+			User.findById(friendsList[i], function(err, foundUser){
+				if(user) {
+					if(foundUser.receivedMedias.indexOf(req.body.media_id) == -1) {
+						foundUser.receivedMedias.push(req.body.media_id);
+						foundUser.save();
+						console.log("Hello");
+					} else {
+						// do nothing
+					}
+				} else {
+					// skip this one and move on to the next one
+				}
+			})
+			res.send({success:"Media has been spreaded."});
+		}
+
+	} else {
+		res.status(400);
+		res.json({error: "The POST request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
+	}
+})
 
 
 

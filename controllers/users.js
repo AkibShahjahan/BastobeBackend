@@ -17,11 +17,15 @@ router.get("/", function(req, res){
 
 router.get("/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
-		if(err) {
+		if(user == null) {
 			//console.log(err);
+			res.status(404);
+			res.json({error: "User not found."});
+		} else if(err) {
 			res.status(400);
-			res.json({error: "Finding failed."});
+			res.json({error: "Finding failed"});
 		} else {
+			console.log("xxxxx");
 			res.status(200);
 			res.send(user);
 		}
@@ -54,7 +58,8 @@ router.post("/", function(req, res){
 				lastName: req.body.last_name,
 				token: "DeveloperToken"
 			},
-			points: 10
+			points: 10,
+			receivedMedias: []
 		};
 
 		User.create(newUser, function(err, newCreation){

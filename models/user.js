@@ -11,7 +11,13 @@ var userSchema = new mongoose.Schema({
 	points: {
 		type: Number,
 		default: 0
-	}
+	},
+	receivedMedias: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Media"
+		}
+	]
 })
 
 var User = mongoose.model("User", userSchema);
