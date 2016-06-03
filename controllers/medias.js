@@ -156,7 +156,6 @@ router.post("/spread", function(req, res){
 	&& req.body.hasOwnProperty("friends_list") && req.body.hasOwnProperty("media_creator_id")){
 		var friendsList = JSON.parse(req.body.friends_list);
 		var friendsListLength = friendsList.length;
-		res.send(friendsListLength.toString());
 		for(var i = 0; i < friendsListLength; i++) {
 			User.findOne({"facebook.id": friendsList[i]}, function(err, foundUser){
 				if(foundUser != null) {
@@ -171,10 +170,8 @@ router.post("/spread", function(req, res){
 					// skip this one and move on to the next one
 				}
 			})
-			res.send("xo");
-		//	res.send({success:"Media has been spreaded."});
+			res.send({success:"Media has been spreaded."});
 		}
-		res.send("mm");
 
 	} else {
 		res.status(400);
