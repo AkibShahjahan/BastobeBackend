@@ -152,34 +152,35 @@ router.put("/:id/likes/like", function(req, res){
 });
 
 router.post("/spread", function(req, res){
-	if(req.body.hasOwnProperty("spreader_id") && req.body.hasOwnProperty("media_id")
-	&& req.body.hasOwnProperty("friends_list") && req.body.hasOwnProperty("media_creator_id")){
-		var friendsList = JSON.parse(req.body.friends_list);
-		var friendsListLength = friendsList.length;
-		for(var i = 0; i < friendsListLength; i++) {
-			User.findOne({"facebook.id": friendsList[i]}, function(err, foundUser){
-				if(foundUser != null) {
-					if(foundUser.receivedMedias.indexOf(req.body.media_id) == -1) {
-						foundUser.receivedMedias.push(req.body.media_id);
-						foundUser.save();
-						console.log("Hello");
-					} else {
-						// do nothing
-					}
-				} else {
-					// skip this one and move on to the next one
-				}
-			})
-			res.send("xo");
-		//	res.send({success:"Media has been spreaded."});
-		}
-		res.send("mm");
-
-	} else {
-		res.status(400);
-		res.send("damn");
-	//	res.json({error: "The POST request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
-	}
+	res.send("hi");
+	// if(req.body.hasOwnProperty("spreader_id") && req.body.hasOwnProperty("media_id")
+	// && req.body.hasOwnProperty("friends_list") && req.body.hasOwnProperty("media_creator_id")){
+	// 	var friendsList = JSON.parse(req.body.friends_list);
+	// 	var friendsListLength = friendsList.length;
+	// 	for(var i = 0; i < friendsListLength; i++) {
+	// 		User.findOne({"facebook.id": friendsList[i]}, function(err, foundUser){
+	// 			if(foundUser != null) {
+	// 				if(foundUser.receivedMedias.indexOf(req.body.media_id) == -1) {
+	// 					foundUser.receivedMedias.push(req.body.media_id);
+	// 					foundUser.save();
+	// 					console.log("Hello");
+	// 				} else {
+	// 					// do nothing
+	// 				}
+	// 			} else {
+	// 				// skip this one and move on to the next one
+	// 			}
+	// 		})
+	// 		res.send("xo");
+	// 	//	res.send({success:"Media has been spreaded."});
+	// 	}
+	// 	res.send("mm");
+	//
+	// } else {
+	// 	res.status(400);
+	// 	res.send("damn");
+	// //	res.json({error: "The POST request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
+	// }
 })
 
 
