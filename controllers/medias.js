@@ -158,7 +158,7 @@ router.post("/spread", function(req, res){
 		var friendsListLength = friendsList.length;
 		for(var i = 0; i < friendsListLength; i++) {
 			User.findOne({"facebook.id": friendsList[i]}, function(err, foundUser){
-				if(user) {
+				if(foundUser != null) {
 					if(foundUser.receivedMedias.indexOf(req.body.media_id) == -1) {
 						foundUser.receivedMedias.push(req.body.media_id);
 						foundUser.save();
