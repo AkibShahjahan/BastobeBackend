@@ -4,7 +4,7 @@ var mediaSchema = new mongoose.Schema({
   creatorId: String,
 	generalInfo: {
 		likes: Number,
-		spread: Number,
+		spreads: Number,
 		caption: String,
 		author: String,
 	},

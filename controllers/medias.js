@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router()
 var Media = require("../models/media");
 var User = require("../models/user");
+var MediaRecord = require("../models/mediaRecord");
 
 
 router.get("/", function(req, res){
@@ -55,7 +56,7 @@ router.get("/feed/:x/:y", function(req, res){
 
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
-		if(err) {
+		if(!media) {
 			//console.log(err);
 			res.status(400);
 			res.json({error: "Finding failed."});
@@ -77,7 +78,7 @@ router.post("/", function(req, res){
 			creatorId: req.body.creator_id,
 			generalInfo: {
 				likes: 0,
-				spread: 0,
+				spreads: 0,
 				caption: req.body.caption_label,
 				author: req.body.author
 			},
@@ -91,12 +92,31 @@ router.post("/", function(req, res){
 			mediaType: req.body.media_type
 		};
 
-		Media.create(newMedia, function(err, newCreation){
+		Media.create(newMedia, function(err, newCreation) {
 			if(err) {
 				res.json({error: "Creation failed."});
 				console.log(err);
 			} else {
-				res.send(newCreation._id.toString());
+				var newMediaId = newCreation._id.toString();
+
+				var newMediaRecord = {
+					mediaId: newMediaId,
+					likeRecord: [],
+					spreadRecord: [],
+					viewRecord: []
+				}
+				MediaRecord.create(newMediaRecord, function(err, newRecordCreation) {
+					if(err) {
+						res.json({error: "Creation failed."});
+						//
+						//
+						// NEED TO DO SOMETHING HERE TO AVOID ANY PROBLEMS
+						//
+						//
+					} else {
+						res.send(newMediaId);
+					}
+				});
 			}
 		});
 	} else {
@@ -105,6 +125,8 @@ router.post("/", function(req, res){
 	}
 });
 
+
+//Todo: delete the corresponding MediaRecord as well
 router.delete("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
 		if(!media) {
@@ -123,60 +145,94 @@ router.delete("/:id", function(req, res){
 	});
 });
 
-router.put("/:id/likes/like", function(req, res){
-	User.findById(req.params.id, function(err, user){
-		if(err) {
-			res.status(404);
-			res.json({error: "No user with that object id"});
-		} else {
-			var modifiedUser = {
-				facebook: {
-					id: user.facebook.id,
-					email: user.facebook.email,
-					firstName: user.facebook.firstName,
-					lastName: user.facebook.lastName
-				},
-				points: user.points+1
-			};
-			User.findByIdAndUpdate(req.params.id, modifiedUser, function(err, updatedUser){
-				if(err){
-					res.status(404);
-					res.json({error: "No user with that object id"});
-				} else {
-					res.status(200);
-					res.send(modifiedUser);
-				}
-			})
-		}
-	})
-});
 
-router.post("/spread", function(req, res){
-	if(req.body.hasOwnProperty("spreader_id") && req.body.hasOwnProperty("media_id")
-	&& req.body.hasOwnProperty("friends_list") && req.body.hasOwnProperty("media_creator_id")){
+// Obsolete
+// router.put("/:id/likes/like", function(req, res){
+// 	User.findById(req.params.id, function(err, user){
+// 		if(err) {
+// 			res.status(404);
+// 			res.json({error: "No user with that object id"});
+// 		} else {
+// 			var modifiedUser = {
+// 				facebook: {
+// 					id: user.facebook.id,
+// 					email: user.facebook.email,
+// 					firstName: user.facebook.firstName,
+// 					lastName: user.facebook.lastName
+// 				},
+// 				points: user.points+1
+// 			};
+// 			User.findByIdAndUpdate(req.params.id, modifiedUser, function(err, updatedUser){
+// 				if(err){
+// 					res.status(404);
+// 					res.json({error: "No user with that object id"});
+// 				} else {
+// 					res.status(200);
+// 					res.send(modifiedUser);
+// 				}
+// 			})
+// 		}
+// 	})
+// });
+
+router.put("/spread", function(req, res){
+	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("spreader_id")
+	&& req.body.hasOwnProperty("friends_list")){
 		var friendsList = JSON.parse(req.body.friends_list);
 		var friendsListLength = friendsList.length;
 		for(var i = 0; i < friendsListLength; i++) {
 			User.findOne({"facebook.id": friendsList[i]}, function(err, foundUser){
 				if(foundUser != null) {
+					// this condition is needed incase user is using to phones
 					if(foundUser.receivedMedias.indexOf(req.body.media_id) == -1) {
 						foundUser.receivedMedias.push(req.body.media_id);
 						foundUser.save();
-						console.log("Hello");
+
+						Media.findById(req.body.media_id, function(err, foundMedia){
+							if(err) {
+								res.status(400);
+							} else if (!foundMedia) {
+								res.status(404);
+							} else {
+								var mediaUpdate = {
+									generalInfo: {
+										spreads: foundMedia.generalInfo.spreads + 1
+									}
+								}
+								Media.findByIdAndUpdate(req.body.media_id, mediaUpdate, function(err, updatedMedia){
+									if(err) {
+										res.status(400);
+									} else if(!updatedMedia) {
+										res.status(404);
+									} else {
+										res.status(200);
+										res.send("media spreaded");
+									}
+								});
+							}
+						});
 					} else {
+						res.send("Media already spreaded previously");
 						// do nothing
 					}
 				} else {
 					// skip this one and move on to the next one
 				}
 			})
-			res.send({success:"Media has been spreaded."});
+		//	res.send({success:"Media has been spreaded."});
 		}
 
 	} else {
 		res.status(400);
-		res.send("damn");
-	//	res.json({error: "The POST request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
+		res.json({error: "The POST request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
+	}
+})
+
+router.post("/like", function(req, res){
+	//
+	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("liker_id")) {
+
+
 	}
 })
 
