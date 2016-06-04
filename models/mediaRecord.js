@@ -2,6 +2,12 @@ var mongoose = require("mongoose");
 
 var mediaRecordSchema = new mongoose.Schema({
   mediaId: String,
+  viewRecord: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "View"
+    }
+  ],
   likeRecord: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
@@ -12,12 +18,6 @@ var mediaRecordSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
 			ref: "Spread"
-    }
-  ],
-  viewRecord: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-			ref: "View"
     }
   ]
 });

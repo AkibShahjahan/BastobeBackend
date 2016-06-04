@@ -8,7 +8,6 @@ var MediaRecord = require("../models/mediaRecord");
 router.get("/", function(req, res){
 	Media.find({}, function(err, medias){
 		if(err) {
-			console.log(err);
 			res.json({error: "Finding failed."});
 		}
 		else {
@@ -57,7 +56,6 @@ router.get("/feed/:x/:y", function(req, res){
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
 		if(!media) {
-			//console.log(err);
 			res.status(400);
 			res.json({error: "Finding failed."});
 		} else {
@@ -95,7 +93,6 @@ router.post("/", function(req, res){
 		Media.create(newMedia, function(err, newCreation) {
 			if(err) {
 				res.json({error: "Creation failed."});
-				console.log(err);
 			} else {
 				var newMediaId = newCreation._id.toString();
 
@@ -105,11 +102,10 @@ router.post("/", function(req, res){
 					spreadRecord: [],
 					viewRecord: []
 				};
-				
+
 				MediaRecord.create(newMediaRecord, function(err, newRecordCreation) {
 					if(err) {
 						res.json({error: "Creation failed."});
-						console.log("hello1");
 						//
 						//
 						// NEED TO DO SOMETHING HERE TO AVOID ANY PROBLEMS
@@ -128,7 +124,7 @@ router.post("/", function(req, res){
 });
 
 
-//Todo: delete the corresponding MediaRecord as well
+//TODO: delete the corresponding MediaRecord as well
 router.delete("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
 		if(!media) {
@@ -138,7 +134,6 @@ router.delete("/:id", function(req, res){
 		media.remove(function(err){
 			if(err) {
 				res.json({error: "Deletion failed."});
-				console.log(err);
 			}
 			else {
 				res.json({success: "User deleted"});
@@ -177,6 +172,38 @@ router.delete("/:id", function(req, res){
 // 	})
 // });
 
+
+// TODO: MIGHT BE ABLE TO CREATE A COMMON HELPER FOR THESE 4 ROUTES
+
+router.put("/view", function(req, res){
+	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("viewer_id")) {
+		var mediaId = req.body.media_id;
+		var viewerId = req.body.viewer_id;
+		Media.findById(mediaId, function(err, foundMedia){
+			if (err) {
+				res.status(400);
+			} else if (!foundMedia) {
+				res.status(404);
+			} else {
+				foundMedia.generalInfo.views++;
+				foundMedia.save(function(err, savedMedia) {
+					if(err) {
+
+					} else {
+						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+							foundMediaRecord.viewRecord.push(viewerId);
+							foundMediaRecord.save();
+						})
+					}
+				});
+			}
+		});
+	} else {
+		res.status(400);
+		res.json({error: "The PUT request must have 'media_id', and 'viewer_id' keys."});
+	}
+});
+
 router.put("/spread", function(req, res){
 	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("spreader_id")
 	&& req.body.hasOwnProperty("friends_list")){
@@ -197,27 +224,16 @@ router.put("/spread", function(req, res){
 							} else if (!foundMedia) {
 								res.status(404);
 							} else {
-								var mediaUpdate = {
-									generalInfo: {
-										likes: foundMedia.generalInfo.spreads,
-										spreads: foundMedia.generalInfo.spreads + 1,
-										caption: foundMedia.generalInfo.caption,
-										author: foundMedia.generalInfo.author
-									}
-								}
-								Media.findByIdAndUpdate(mediaId, mediaUpdate, function(err, updatedMedia){
+
+								foundMedia.generalInfo.spreads++;
+								foundMedia.save(function(err, savedMedia) {
 									if(err) {
-										res.status(400);
-									} else if(!updatedMedia) {
-										res.status(404);
+
 									} else {
-										res.status(200);
 										MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
-											console.log(foundMediaRecord);
 											foundMediaRecord.spreadRecord.push(req.body.spreader_id);
 											foundMediaRecord.save();
 										})
-										res.send("Media spreaded.");
 									}
 								});
 							}
@@ -239,13 +255,64 @@ router.put("/spread", function(req, res){
 	}
 })
 
-router.post("/like", function(req, res){
-	//
+router.put("/like", function(req, res){
 	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("liker_id")) {
+		var mediaId = req.body.media_id;
+		var likerId = req.body.liker_id;
+		Media.findById(mediaId, function(err, foundMedia){
+			if (err) {
+				res.status(400);
+			} else if (!foundMedia) {
+				res.status(404);
+			} else {
+				foundMedia.generalInfo.likes++;
+				foundMedia.save(function(err, savedMedia) {
+					if(err) {
 
+					} else {
+						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+							foundMediaRecord.likeRecord.push(likerId);
+							foundMediaRecord.save();
+						})
+					}
+				});
+			}
+		});
+	} else {
+		res.status(400);
+		res.json({error: "The PUT request must have 'media_id', and 'liker_id' keys."});
+	}
+});
 
+router.put("/unlike", function(req, res) {
+	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("unliker_id")) {
+		var mediaId = req.body.media_id;
+		var unlikerId = req.body.unliker_id;
+		Media.findById(mediaId, function(err, foundMedia){
+			if (err) {
+				res.status(400);
+			} else if (!foundMedia) {
+				res.status(404);
+			} else {
+				foundMedia.generalInfo.likes--;
+				foundMedia.save(function(err, savedMedia) {
+					if(err) {
+
+					} else {
+						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+							foundMediaRecord.likeRecord.pull(unlikerId);
+							foundMediaRecord.save();
+						})
+					}
+				});
+			}
+		});
+	} else {
+		res.status(400);
+		res.json({error: "The PUT request must have 'media_id', and 'unliker_id' keys."});
 	}
 })
+
 
 
 

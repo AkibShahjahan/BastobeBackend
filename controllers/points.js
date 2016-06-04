@@ -26,7 +26,6 @@ function levelConversion(level) {
 router.get("/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
 		if(err) {
-			//console.log(err);
 			res.status(404);
 			res.json({error: "No user with that object id"});
 		} else {
@@ -39,33 +38,24 @@ router.get("/:id", function(req, res){
 router.put("/:id", function(req, res){
 	if(req.body.hasOwnProperty("level"))
 	{
-		User.findById(req.params.id, function(err, user){
+		User.findById(req.params.id, function(err, foundUser){
 			if(err) {
 				res.status(404);
   			res.json({error: "No user with that object id"});
 			}	else {
-        var updatedPoints = user.points + levelConversion(Number(req.body.level));
-        if(updatedPoints < 0) updatedPoints = 0;
-				var modifiedUser = {
-					facebook: {
-						id: user.facebook.id,
-						firstName: user.facebook.firstName,
-						lastName: user.facebook.lastName,
-						email: user.facebook.email,
-						token: user.facebook.token
-					},
-					points: updatedPoints
-				};
-				User.findByIdAndUpdate(req.params.id, modifiedUser, function(err, updatedUser){
+				if(updatedPoints < 0) updatedPoints = 0;
+        var updatedPoints = foundUser.points + levelConversion(Number(req.body.level));
+				foundUser.points = updatedPoints;
+				foundUser.save(function(err, updatedUser){
 					if(err) {
             res.status(400);
       			res.json({error: "Update failed"});
 					}
 					else {
 						res.status(200);
-						res.send(modifiedUser.points.toString());
+						res.send(updatedUser.points.toString());
 					}
-				})
+				});
 			}
 		})
 	}

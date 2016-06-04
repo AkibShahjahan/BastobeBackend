@@ -5,7 +5,6 @@ var User = require("../models/user");
 router.get("/", function(req, res){
 	User.find({}, function(err, users){
 		if(err) {
-			console.log(err);
 			res.json({error: "Finding failed."});
 		}
 		else
@@ -18,7 +17,6 @@ router.get("/", function(req, res){
 router.get("/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
 		if(user == null) {
-			//console.log(err);
 			res.status(404);
 			res.json({error: "No user with that object id."});
 		} else if(err) {
@@ -64,7 +62,6 @@ router.post("/", function(req, res){
 		User.create(newUser, function(err, newCreation){
 			if(err) {
 				res.json({error: "Creation failed."});
-				console.log(err);
 			} else {
 				res.json({newCreation});
 			}
@@ -85,7 +82,6 @@ router.delete("/:id", function(req, res){
 				if(err)
 				{
 					res.json({error: "Deletion failed."});
-					console.log(err);
 				}
 				else
 				{
