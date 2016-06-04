@@ -22,6 +22,6 @@ var mediaRecordSchema = new mongoose.Schema({
   ]
 });
 
-var MediaHistory = mongoose.model("MediaHistory", mediaRecordSchema);
+var MediaRecord = mongoose.model("MediaRecord", mediaRecordSchema);
 
-module.exports = MediaHistory;
+module.exports = MediaRecord;

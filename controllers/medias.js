@@ -104,10 +104,12 @@ router.post("/", function(req, res){
 					likeRecord: [],
 					spreadRecord: [],
 					viewRecord: []
-				}
+				};
+				
 				MediaRecord.create(newMediaRecord, function(err, newRecordCreation) {
 					if(err) {
 						res.json({error: "Creation failed."});
+						console.log("hello1");
 						//
 						//
 						// NEED TO DO SOMETHING HERE TO AVOID ANY PROBLEMS
@@ -180,15 +182,16 @@ router.put("/spread", function(req, res){
 	&& req.body.hasOwnProperty("friends_list")){
 		var friendsList = JSON.parse(req.body.friends_list);
 		var friendsListLength = friendsList.length;
+		var mediaId = req.body.media_id;
 		for(var i = 0; i < friendsListLength; i++) {
 			User.findOne({"facebook.id": friendsList[i]}, function(err, foundUser){
 				if(foundUser != null) {
-					// this condition is needed incase user is using to phones
+					// this condition is needed incase user is using two phones
 					if(foundUser.receivedMedias.indexOf(req.body.media_id) == -1) {
 						foundUser.receivedMedias.push(req.body.media_id);
 						foundUser.save();
 
-						Media.findById(req.body.media_id, function(err, foundMedia){
+						Media.findById(mediaId, function(err, foundMedia){
 							if(err) {
 								res.status(400);
 							} else if (!foundMedia) {
@@ -196,23 +199,31 @@ router.put("/spread", function(req, res){
 							} else {
 								var mediaUpdate = {
 									generalInfo: {
-										spreads: foundMedia.generalInfo.spreads + 1
+										likes: foundMedia.generalInfo.spreads,
+										spreads: foundMedia.generalInfo.spreads + 1,
+										caption: foundMedia.generalInfo.caption,
+										author: foundMedia.generalInfo.author
 									}
 								}
-								Media.findByIdAndUpdate(req.body.media_id, mediaUpdate, function(err, updatedMedia){
+								Media.findByIdAndUpdate(mediaId, mediaUpdate, function(err, updatedMedia){
 									if(err) {
 										res.status(400);
 									} else if(!updatedMedia) {
 										res.status(404);
 									} else {
 										res.status(200);
-										res.send("media spreaded");
+										MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+											console.log(foundMediaRecord);
+											foundMediaRecord.spreadRecord.push(req.body.spreader_id);
+											foundMediaRecord.save();
+										})
+										res.send("Media spreaded.");
 									}
 								});
 							}
 						});
 					} else {
-						res.send("Media already spreaded previously");
+						res.send("Media already spreaded previously.");
 						// do nothing
 					}
 				} else {
@@ -224,7 +235,7 @@ router.put("/spread", function(req, res){
 
 	} else {
 		res.status(400);
-		res.json({error: "The POST request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
+		res.json({error: "The PUT request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
 	}
 })
 
