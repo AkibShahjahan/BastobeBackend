@@ -58,7 +58,7 @@ router.get("/feed/:x/:y", function(req, res){
 												res.json(medias);
 											}
 	});
-});
+}); 
 
 // Send on ly first 100 (?)
 router.get("/rank/global", function(req, res){
