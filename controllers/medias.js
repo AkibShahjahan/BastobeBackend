@@ -58,7 +58,7 @@ router.get("/feed/:x/:y", function(req, res){
 												res.json(medias);
 											}
 	});
-}); 
+});
 
 // Send on ly first 100 (?)
 router.get("/rank/global", function(req, res){
@@ -78,6 +78,9 @@ router.get("/rank/global", function(req, res){
 
 // Need to test this
 router.get("/rank/:x/:y", function(req, res){
+	var x = parseFloat(req.params.x);
+	var y = parseFloat(req.params.y);
+	var rad = 0.02;
 	Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
 									 	{"coordinate.x": {$lt: x + rad}},
 									 	{"coordinate.y": {$gt: y - rad}},
