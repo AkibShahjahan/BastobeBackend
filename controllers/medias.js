@@ -33,7 +33,12 @@ router.delete("/delete", function(req, res){
 // global feed
 router.get("/feed/global", function(req, res){
 	 Media.find({}).sort({time: -1}).exec(function(err, medias) {
-		 res.send(medias);
+		 if(err) {
+			 // NOT SURE ABOUT THIS
+ 			 res.status(400);
+		 } else {
+			 res.json(medias);
+		 }
 	 });
 });
 
@@ -46,12 +51,45 @@ router.get("/feed/:x/:y", function(req, res){
 									 	{"coordinate.x": {$lt: x + rad}},
 									 	{"coordinate.y": {$gt: y - rad}},
 									 	{"coordinate.y": {$lt: y + rad}}]}).sort({time: -1}).exec(function(err, medias) {
-		res.json(medias);
-	})
-})
-// /feed/x/y
-// /rank/world
-// /rank/x/y
+											if(err) {
+												// NOT SURE ABOUT THIS
+												res.status(400);
+											} else {
+												res.json(medias);
+											}
+	});
+});
+
+// Send on ly first 100 (?)
+router.get("/rank/global", function(req, res){
+	Media.find({}).sort({"generalInfo.likes": -1}).exec(function(err, medias) {
+		if(err) {
+			// NOT SURE ABOUT THIS
+			res.status(400);
+		} else {
+			if(medias.length >= 100){
+				res.json(medias.slice(0, 100));
+			} else {
+				res.json(medias);
+			}
+		}
+	});
+});
+
+// Need to test this
+router.get("/rank/:x/:y", function(req, res){
+	Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
+									 	{"coordinate.x": {$lt: x + rad}},
+									 	{"coordinate.y": {$gt: y - rad}},
+									 	{"coordinate.y": {$lt: y + rad}}]}).sort({"generalInfo.likes": -1}).exec(function(err, medias) {
+											if(err) {
+												// NOT SURE ABOUT THIS
+												res.status(400);
+											} else {
+												res.send(medias);
+											}
+	});
+});
 
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
@@ -273,6 +311,7 @@ router.put("/like", function(req, res){
 						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
 							foundMediaRecord.likeRecord.push(likerId);
 							foundMediaRecord.save();
+							res.send(foundMedia);
 						})
 					}
 				});
