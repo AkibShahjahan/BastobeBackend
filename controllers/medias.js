@@ -74,7 +74,7 @@ router.get("/rank/global", function(req, res){
 			}
 		}
 	});
-});  
+}); 
 
 // Need to test this
 router.get("/rank/:x/:y", function(req, res){
