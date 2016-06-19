@@ -238,7 +238,7 @@ router.put("/view", function(req, res){
 					}
 				});
 			}
-		});
+		}); 
 	} else {
 		res.status(400);
 		res.json({error: "The PUT request must have 'media_id', and 'viewer_id' keys."});
