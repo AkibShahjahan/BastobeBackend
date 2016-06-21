@@ -233,12 +233,19 @@ router.put("/view", function(req, res){
 					} else {
 						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
 							foundMediaRecord.viewRecord.push(viewerId);
-							foundMediaRecord.save();
+							foundMediaRecord.save(function(err, savedMediaRecord) {
+								if(err){
+
+								} else {
+									res.send("Successfully viewed.");
+								}
+
+							});
 						})
 					}
 				});
 			}
-		}); 
+		});
 	} else {
 		res.status(400);
 		res.json({error: "The PUT request must have 'media_id', and 'viewer_id' keys."});
@@ -273,7 +280,14 @@ router.put("/spread", function(req, res){
 									} else {
 										MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
 											foundMediaRecord.spreadRecord.push(req.body.spreader_id);
-											foundMediaRecord.save();
+											foundMediaRecord.save(function(err, savedMediaRecord) {
+												if(err){
+
+												} else {
+													res.send("Successfully spreaded.");
+												}
+
+											});
 										})
 									}
 								});
@@ -313,8 +327,14 @@ router.put("/like", function(req, res){
 					} else {
 						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
 							foundMediaRecord.likeRecord.push(likerId);
-							foundMediaRecord.save();
-							res.send(foundMedia);
+							foundMediaRecord.save(function(err, savedMediaRecord) {
+								if(err){
+
+								} else {
+									res.send("Successfully liked.");
+								}
+
+							});
 						})
 					}
 				});
@@ -343,7 +363,14 @@ router.put("/unlike", function(req, res) {
 					} else {
 						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
 							foundMediaRecord.likeRecord.pull(unlikerId);
-							foundMediaRecord.save();
+							foundMediaRecord.save(function(err, savedMediaRecord) {
+								if(err){
+
+								} else {
+									res.send("Successfully unliked.");
+								}
+
+							});
 						})
 					}
 				});

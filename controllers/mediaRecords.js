@@ -2,6 +2,16 @@ var express = require("express");
 var router = express.Router()
 var MediaRecord = require("../models/mediaRecord");
 
+router.delete("/delete", function(req, res){
+	MediaRecord.remove({}, function(err, deletedRecords){
+		if(!err) {
+			res.json({success: "All entities have been removed."});
+		} else {
+			res.json({error: "Sorry, the deletion was not successful"})
+		}
+	})
+})
+
 router.get("/", function(req, res){
 	MediaRecord.find({}, function(err, mediaRecords){
 		if(err) {
