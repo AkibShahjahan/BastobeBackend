@@ -35,8 +35,29 @@ module.exports = function(passport){
 	    						//res.status(500);
 	    						throw err;
 	    					}
-	    					//res.status(201)
-	    					return done(null, newUser);
+	    					else {
+									var newUserId = newUser._id.toString();
+
+									var newUserRecord = {
+										userId: newUserId,
+										likeRecord: [],
+										spreadRecord: [],
+										viewRecord: []
+									};
+
+									UserRecord.create(newUserRecord, function(err, newRecordCreation) {
+										if(err) {
+											res.json({error: "Creation failed."});
+											//
+											//
+											// NEED TO DO SOMETHING HERE TO AVOID ANY PROBLEMS
+											//
+											//
+										} else {
+											return done(null, newUser);
+										}
+									});
+								}
 	    				})
 	    			}
     		});

@@ -29,14 +29,16 @@ db.once('open', function callback () {
 });
 
 var userRoutes = require("./controllers/users");
+var userRecordRoutes = require("./controllers/userRecords");
 var mediaRoutes = require("./controllers/medias");
+var mediaRecordRoutes = require("./controllers/mediaRecords");
 var pointRoutes = require("./controllers/points");
-var mediaRecordRoutes = require("./controllers/mediaRecords")
 
 app.use("/users", userRoutes);
 app.use("/medias", mediaRoutes);
 app.use("/points", pointRoutes);
 app.use("/mediaRecords", mediaRecordRoutes);
+app.use("/userRecords", userRecordRoutes);
 
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!

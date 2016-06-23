@@ -62,7 +62,7 @@ router.get("/feed/:x/:y", function(req, res){
 
 // Send on ly first 100 (?)
 router.get("/rank/global", function(req, res){
-	Media.find({}).sort({"generalInfo.likes": -1}).exec(function(err, medias) {
+	Media.find({}).sort({"generalInfo.likes": -1}).sort({time: -1}).exec(function(err, medias) {
 		if(err) {
 			// NOT SURE ABOUT THIS
 			res.status(400);
@@ -84,7 +84,7 @@ router.get("/rank/:x/:y", function(req, res){
 	Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
 									 	{"coordinate.x": {$lt: x + rad}},
 									 	{"coordinate.y": {$gt: y - rad}},
-									 	{"coordinate.y": {$lt: y + rad}}]}).sort({"generalInfo.likes": -1}).exec(function(err, medias) {
+									 	{"coordinate.y": {$lt: y + rad}}]}).sort({"generalInfo.likes": -1}).sort({time: -1}).exec(function(err, medias) {
 											if(err) {
 												// NOT SURE ABOUT THIS
 												res.status(400);
