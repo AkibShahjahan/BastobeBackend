@@ -42,7 +42,7 @@ module.exports = function(passport){
 										userId: newUserId,
 										likeRecord: [],
 										spreadRecord: [],
-										viewRecord: []
+										commentRecord: []
 									};
 
 									UserRecord.create(newUserRecord, function(err, newRecordCreation) {
