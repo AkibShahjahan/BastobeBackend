@@ -253,12 +253,20 @@ router.put("/view", function(req, res){
 	}
 });
 
+
+// change to person who spread it instead of the ones who got spreaded to
 router.put("/spread", function(req, res){
 	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("spreader_id")
 	&& req.body.hasOwnProperty("friends_list")){
 		var friendsList = JSON.parse(req.body.friends_list);
 		var friendsListLength = friendsList.length;
 		var mediaId = req.body.media_id;
+		MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+			if(foundMediaRecord.spreadRecord.indexOf(spreader_id) == -1) {
+				foundMediaRecord.spreadRecord.push(req.body.spreader_id);
+				foundMediaRecord.save();
+			}
+		});
 		for(var i = 0; i < friendsListLength; i++) {
 			UserRecord.findOne({"userFbId": friendsList[i]}, function(err, foundUserRecord){
 				console.log(foundUserRecord);
@@ -283,17 +291,7 @@ router.put("/spread", function(req, res){
 									if(err) {
 
 									} else {
-										MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
-											foundMediaRecord.spreadRecord.push(req.body.spreader_id);
-											foundMediaRecord.save(function(err, savedMediaRecord) {
-												if(err){
-
-												} else {
-													res.send("Successfully spreaded.");
-												}
-
-											});
-										})
+										res.send("Successfully spreaded.");
 									}
 								});
 							}
