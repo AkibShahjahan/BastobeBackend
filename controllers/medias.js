@@ -3,6 +3,7 @@ var router = express.Router()
 var Media = require("../models/media");
 var User = require("../models/user");
 var MediaRecord = require("../models/mediaRecord");
+var UserRecord = require("../models/userRecord");
 
 
 router.get("/", function(req, res){
@@ -259,12 +260,12 @@ router.put("/spread", function(req, res){
 		var friendsListLength = friendsList.length;
 		var mediaId = req.body.media_id;
 		for(var i = 0; i < friendsListLength; i++) {
-			User.findOne({"facebook.id": friendsList[i]}, function(err, foundUser){
-				if(foundUser != null) {
-					// this condition is needed incase user is using two phones
-					if(foundUser.receivedMedias.indexOf(req.body.media_id) == -1) {
-						foundUser.receivedMedias.push(req.body.media_id);
-						foundUser.save();
+			UserRecord.findOne({"facebook.id": friendsList[i]}, function(err, foundUserRecord){
+				if(foundUserRecord != null) {
+					// this condition is needed incase two people spread same thing to user
+					if(foundUserRecord.spreadRecord.indexOf(req.body.media_id) == -1) {
+						foundUserRecord.spreadRecord.push(req.body.media_id);
+						foundUserRecord.save();
 
 						Media.findById(mediaId, function(err, foundMedia){
 							if(err) {
@@ -331,11 +332,19 @@ router.put("/like", function(req, res){
 								if(err){
 
 								} else {
+									UserRecord.findById(likerId, function(err, foundUserRecord){
+										if(foundUserRecord != null) {
+											if(foundUserRecord.likeRecord.indexOf(req.body.media_id) == -1) {
+												foundUserRecord.likeRecord.push(req.body.media_id);
+												foundUserRecord.save();
+											}
+										}
+									});
 									res.send("Successfully liked.");
 								}
 
 							});
-						})
+						});
 					}
 				});
 			}
@@ -367,6 +376,14 @@ router.put("/unlike", function(req, res) {
 								if(err){
 
 								} else {
+									UserRecord.findById(likerId, function(err, foundUserRecord){
+										if(foundUserRecord != null) {
+											if(foundUserRecord.likeRecord.indexOf(req.body.media_id) == -1) {
+												foundUserRecord.likeRecord.pull(req.body.media_id);
+												foundUserRecord.save();
+											}
+										}
+									});
 									res.send("Successfully unliked.");
 								}
 
