@@ -25,7 +25,7 @@ router.get("/", function(req, res){
 
 router.get("/:userId", function(req, res){
 	UserRecord.findOne({"userId": req.params.userId}, function(err, userRecord){
-		if(err) {
+		if(!userRecord) {
 			res.status(400);
 			res.json({error: "Finding failed."});
 		} else {
@@ -37,7 +37,7 @@ router.get("/:userId", function(req, res){
 
 router.get("/:userId/likes", function(req, res){
   UserRecord.findOne({"userId": req.params.userId}, function(err, userRecord){
-		if(err) {
+		if(!userRecord) {
 			res.status(400);
 			res.json({error: "Finding failed."});
 		} else {
