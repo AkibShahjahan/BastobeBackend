@@ -262,7 +262,7 @@ router.put("/spread", function(req, res){
 		var friendsListLength = friendsList.length;
 		var mediaId = req.body.media_id;
 		MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
-			if(foundMediaRecord.spreadRecord.indexOf(spreader_id) == -1) {
+			if(foundMediaRecord.spreadRecord.indexOf(req.body.spreader_id) == -1) {
 				foundMediaRecord.spreadRecord.push(req.body.spreader_id);
 				foundMediaRecord.save();
 			}
