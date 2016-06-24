@@ -326,21 +326,27 @@ router.put("/like", function(req, res){
 					if(err) {
 
 					} else {
+						// maybe should check if already liked or not
 						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
 							foundMediaRecord.likeRecord.push(likerId);
 							foundMediaRecord.save(function(err, savedMediaRecord) {
 								if(err){
 
 								} else {
-									UserRecord.findById(likerId, function(err, foundUserRecord){
+									UserRecord.findOne({"userId": likerId}, function(err, foundUserRecord){
 										if(foundUserRecord != null) {
 											if(foundUserRecord.likeRecord.indexOf(req.body.media_id) == -1) {
 												foundUserRecord.likeRecord.push(req.body.media_id);
-												foundUserRecord.save();
+												foundUserRecord.save(function(err, savedUser){
+													if(!savedUser){
+														res.send("Unsuccessful");
+													} else {
+														res.send("Successfully liked.");
+													}
+												});
 											}
 										}
 									});
-									res.send("Successfully liked.");
 								}
 
 							});
@@ -376,12 +382,16 @@ router.put("/unlike", function(req, res) {
 								if(err){
 
 								} else {
-									UserRecord.findById(likerId, function(err, foundUserRecord){
-										if(foundUserRecord != null) {
-											if(foundUserRecord.likeRecord.indexOf(req.body.media_id) == -1) {
-												foundUserRecord.likeRecord.pull(req.body.media_id);
-												foundUserRecord.save();
-											}
+									UserRecord.findOne({"userId": unlikerId}, function(err, foundUserRecord){
+										if(!foundUserRecord)
+										{
+
+										}
+										else if (foundUserRecord != null) {
+											foundUserRecord.likeRecord.pull(req.body.media_id);
+											foundUserRecord.save();
+										} else {
+											// err
 										}
 									});
 									res.send("Successfully unliked.");
