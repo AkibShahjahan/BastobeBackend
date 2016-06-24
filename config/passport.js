@@ -38,9 +38,11 @@ module.exports = function(passport){
 	    					}
 	    					else {
 									var newUserId = newUser._id.toString();
+									var newUserFbId = newUser.facebook.id.toString();
 
 									var newUserRecord = {
 										userId: newUserId,
+										userFbId: newUserFbId,
 										likeRecord: [],
 										spreadRecord: [],
 										commentRecord: []

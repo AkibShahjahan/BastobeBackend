@@ -2,6 +2,7 @@ var mongoose = require("mongoose");
 
 var userRecordSchema = new mongoose.Schema({
   userId: String,
+  userFbId: String,
   likeRecord: [
 		{
 			type: mongoose.Schema.Types.ObjectId,

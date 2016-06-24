@@ -45,7 +45,31 @@ router.get("/:userId/likes", function(req, res){
 			res.send(userRecord.likeRecord);
 		}
 	});
-})
+});
+
+router.get("/:userId/spreads", function(req, res){
+  UserRecord.findOne({"userId": req.params.userId}, function(err, userRecord){
+		if(!userRecord) {
+			res.status(400);
+			res.json({error: "Finding failed."});
+		} else {
+			res.status(200);
+			res.send(userRecord.spreadRecord);
+		}
+	});
+});
+
+router.get("/:userId/comments", function(req, res){
+  UserRecord.findOne({"userId": req.params.userId}, function(err, userRecord){
+		if(!userRecord) {
+			res.status(400);
+			res.json({error: "Finding failed."});
+		} else {
+			res.status(200);
+			res.send(userRecord.commentRecord);
+		}
+	});
+});
 
 
 
