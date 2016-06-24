@@ -260,10 +260,14 @@ router.put("/spread", function(req, res){
 		var friendsListLength = friendsList.length;
 		var mediaId = req.body.media_id;
 		for(var i = 0; i < friendsListLength; i++) {
-			UserRecord.findOne({"facebook.id": friendsList[i]}, function(err, foundUserRecord){
+			UserRecord.findOne({"userFbId": friendsList[i]}, function(err, foundUserRecord){
+				console.log(foundUserRecord);
+
 				if(foundUserRecord != null) {
+
 					// this condition is needed incase two people spread same thing to user
 					if(foundUserRecord.spreadRecord.indexOf(req.body.media_id) == -1) {
+						console.log("XXX");
 						foundUserRecord.spreadRecord.push(req.body.media_id);
 						foundUserRecord.save();
 
