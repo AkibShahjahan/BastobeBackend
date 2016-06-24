@@ -1,4 +1,5 @@
 var FacebookTokenStrategy = require("passport-facebook-token");
+var UserRecord = require("../models/userRecord");
 
 var User = require("../models/user");
 var configAuth = require("./auth");
@@ -42,7 +43,7 @@ module.exports = function(passport){
 										userId: newUserId,
 										likeRecord: [],
 										spreadRecord: [],
-										commentRecord: [] 
+										commentRecord: []
 									};
 
 									UserRecord.create(newUserRecord, function(err, newRecordCreation) {
