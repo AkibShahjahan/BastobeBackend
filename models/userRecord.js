@@ -6,19 +6,19 @@ var userRecordSchema = new mongoose.Schema({
   likeRecord: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Like"
+			ref: "Media"
 		}
 	],
   spreadRecord: [
     {
       type: mongoose.Schema.Types.ObjectId,
-			ref: "Spread"
+			ref: "Media"
     }
   ],
   commentRecord: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment"
+      ref: "Media"
     }
   ]
 });
