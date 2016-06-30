@@ -83,7 +83,7 @@ module.exports = {
 				// res.status(400);
 				// res.json({error: err});
 			} else {
-        var updatedPoints = foundUser.points + levelConversion(req.body.level);
+        var updatedPoints = foundUser.points + levelConversion(level);
 				if(updatedPoints < 0) updatedPoints = 0;
 				foundUser.points = updatedPoints;
 				foundUser.save();
