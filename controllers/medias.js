@@ -4,7 +4,7 @@ var Media = require("../models/media");
 var User = require("../models/user");
 var MediaRecord = require("../models/mediaRecord");
 var UserRecord = require("../models/userRecord");
-var Points = require("./points.js");
+var Points = require("../helpers/points");
 
 router.get("/", function(req, res){
 	Media.find({}, function(err, medias){
@@ -224,26 +224,30 @@ router.put("/view", function(req, res){
 	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("viewer_id")) {
 		var mediaId = req.body.media_id;
 		var viewerId = req.body.viewer_id;
-		Media.findById(mediaId, function(err, foundMedia){
-			if (err) {
-				res.status(400);
-				res.json({error: err});
-			} else if (!foundMedia) {
-				res.status(404);
-				res.json({error: "Not Found"});
+		MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+			if(foundMediaRecord) {
+				if(foundMediaRecord.viewRecord.indexOf(viewerId)==-1) {
+					Media.findById(mediaId, function(err, foundMedia){
+						if(foundMedia) {
+							foundMedia.generalInfo.views++;
+							foundMedia.save();
+							foundMediaRecord.viewRecord.push(viewerId);
+							foundMediaRecord.save();
+							Points.updatePointsWithLevel(viewerId, "View");
+							res.status(200);
+							res.json({response: "Media successfully viewed."});
+						} else {
+							res.status(404);
+							res.json({error: "Error finding media."});
+						}
+					});
+				} else {
+					res.status(400);
+					res.json({error: "Media already viewed."});
+				}
 			} else {
-				MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
-					if(foundMediaRecord.viewRecord.indexOf(viewerId)==-1) {
-						foundMedia.generalInfo.views++;
-						foundMedia.save();
-						foundMediaRecord.viewRecord.push(viewerId);
-						foundMediaRecord.save();
-						Points.updatePointsWithLevel(viewerId, "View");
-						res.send("Media successfully viewed");
-					} else {
-						res.send("Media already viewed");
-					}
-				});
+				res.status(404);
+				res.json({error: "Error finding media record."});
 			}
 		});
 	} else {
@@ -266,107 +270,81 @@ router.put("/spread", function(req, res){
 				foundMediaRecord.save();
 			}
 		});
+		Media.findById(mediaId, function(err, foundMedia){
+			if(foundMedia) {
+				foundMedia.generalInfo.spreads++;
+				foundMedia.save(function(err, savedMedia) {
+					Points.updatePointsWithLevel(foundMedia.creatorId, "Spread");
+				});
+			}
+		});
 		for(var i = 0; i < friendsListLength; i++) {
 			UserRecord.findOne({"userFbId": friendsList[i]}, function(err, foundUserRecord){
-				console.log(foundUserRecord);
-
-				if(foundUserRecord != null) {
-
+				if(foundUserRecord) {
 					// this condition is needed incase two people spread same thing to user
 					if(foundUserRecord.spreadRecord.indexOf(req.body.media_id) == -1) {
 						foundUserRecord.spreadRecord.push(req.body.media_id);
 						foundUserRecord.save();
-
-						Media.findById(mediaId, function(err, foundMedia){
-							if(err) {
-								res.status(400);
-								res.json({error: err});
-							} else if (!foundMedia) {
-								res.status(404);
-								res.json({error: "Not Found"});
-							} else {
-								foundMedia.generalInfo.spreads++;
-								foundMedia.save(function(err, savedMedia) {
-									if(err) {
-										res.status(400);
-										res.json({error: err});
-									} else {
-										res.status(200);
-										res.send("Successfully spreaded.");
-									}
-								});
-							}
-						});
 					} else {
-						res.status(200);
-						res.send("Media already spreaded previously.");
+						// skip this one and move on to the next one
 					}
 				} else {
 					// skip this one and move on to the next one
 				}
 			});
 		}
+		res.status(200);
+		res.json({response: "Media successfully spreaded"});
 	} else {
 		res.status(400);
 		res.json({error: "The PUT request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
 	}
-})
+});
 
 router.put("/like", function(req, res){
 	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("liker_id")) {
 		var mediaId = req.body.media_id;
 		var likerId = req.body.liker_id;
-		Media.findById(mediaId, function(err, foundMedia){
-			if (err) {
-				res.status(400);
-				res.json({error: err});
-			} else if (!foundMedia) {
-				res.status(404);
-				res.json({error: "Not Found"});
+		MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+			if(foundMediaRecord) {
+				if(foundMediaRecord.likeRecord.indexOf(likerId) == -1) {
+					foundMediaRecord.likeRecord.push(likerId);
+					foundMediaRecord.save();
+					UserRecord.findOne({"userId": likerId}, function(err, foundUserRecord){
+						if(foundUserRecord) {
+							if(foundUserRecord.likeRecord.indexOf(mediaId) == -1) {
+								foundUserRecord.likeRecord.push(req.body.media_id);
+								foundUserRecord.save();
+								Media.findById(mediaId, function(err, foundMedia){
+									if(foundMedia) {
+										foundMedia.generalInfo.likes++;
+										foundMedia.save();
+										Points.updatePointsWithLevel(foundMedia.creatorId, "Like");
+										res.status(200);
+										res.json({response: "Media successfuly liked."});
+									} else {
+										res.status(404);
+										res.json({error: "Error finding media."});
+									}
+								});
+							} else {
+								res.status(400);
+								res.json({error: "Media already liked."});
+							}
+						} else {
+							res.status(404);
+							res.json({error: "Error finding user record."});
+						}
+					});
+				} else {
+					res.status(400);
+					res.json({error: "Media already liked."});
+				}
 			} else {
-				foundMedia.generalInfo.likes++;
-				foundMedia.save(function(err, savedMedia) {
-					if(err) {
-						res.status(400);
-						res.json({error: err});
-					} else {
-						// maybe should check if already liked or not
-						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
-							foundMediaRecord.likeRecord.push(likerId);
-							foundMediaRecord.save(function(err, savedMediaRecord) {
-								if(err){
-									res.status(400);
-									res.json({error: err});
-								} else {
-									UserRecord.findOne({"userId": likerId}, function(err, foundUserRecord){
-										if(foundUserRecord != null) {
-											if(foundUserRecord.likeRecord.indexOf(req.body.media_id) == -1) {
-												foundUserRecord.likeRecord.push(req.body.media_id);
-												foundUserRecord.save(function(err, savedUser){
-													if(!savedUser){
-														res.status(400)
-														res.send("Unsuccessful");
-													} else if (err) {
-														res.status(400)
-														res.json({error: err});
-													} else {
-														res.send("Successfully liked.");
-													}
-												});
-											}
-										}
-									});
-								}
-
-							});
-						});
-					}
-				});
+				res.status(404);
+				res.json({error: "Error finding media record."});
 			}
 		});
-	} else {
-		res.status(400);
-		res.json({error: "The PUT request must have 'media_id', and 'liker_id' keys."});
 	}
 });
 
@@ -375,43 +353,38 @@ router.put("/unlike", function(req, res) {
 		var mediaId = req.body.media_id;
 		var unlikerId = req.body.unliker_id;
 		Media.findById(mediaId, function(err, foundMedia){
-			if (err) {
-				res.status(400);
-			} else if (!foundMedia) {
-				res.status(404);
-			} else {
-				foundMedia.generalInfo.likes--;
-				foundMedia.save(function(err, savedMedia) {
-					if(err) {
-
-					} else {
-						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+			if(foundMedia) {
+				MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+					if(foundMediaRecord) {
+						if(foundMediaRecord.likeRecord.indexOf(unlikedId) != -1) {
+							foundMedia.generalInfo.likes--;
+							foundMedia.save();
 							foundMediaRecord.likeRecord.pull(unlikerId);
-							foundMediaRecord.save(function(err, savedMediaRecord) {
-								if(err){
-									res.status(400);
-									res.json({error: err});
+							foundMediaRecord.save();
+							UserRecord.findOne({"userId": unlikerId}, function(err, foundUserRecord){
+								if(foundUserRecord) {
+									foundUserRecord.likeRecord.pull(req.body.media_id);
+									foundUserRecord.save();
+									Points.updatePointsWithLevel(foundMedia.creatorId, "Unlike");
+									res.status(200);
+									res.json({resposne: "Media successfully liked."});
 								} else {
-									UserRecord.findOne({"userId": unlikerId}, function(err, foundUserRecord){
-										if(!foundUserRecord) {
-											res.status(404);
-											res.json({error: "Not Found"});
-										}
-										else if (foundUserRecord != null) {
-											foundUserRecord.likeRecord.pull(req.body.media_id);
-											foundUserRecord.save();
-										} else {
-											res.status(400);
-											res.json({error: err});
-										}
-									});
-									res.send("Successfully unliked.");
+									res.status(404);
+									res.json({error: "Error finding user record."});
 								}
-
 							});
-						})
+						} else {
+							res.status(400);
+							res.json({error: "Media already unliked."});
+						}
+					} else {
+						res.status(404);
+						res.json({error: "Error finding media record."});
 					}
 				});
+			} else {
+				res.status(404);
+				res.json({error: "Error finding media."});
 			}
 		});
 	} else {
@@ -419,12 +392,6 @@ router.put("/unlike", function(req, res) {
 		res.json({error: "The PUT request must have 'media_id', and 'unliker_id' keys."});
 	}
 })
-
-// router.get("/test/one", function(res, res){
-// 	res.send(Points.updatePointsWithLevel("xo", "lmao"));
-// })
-
-
 
 
 module.exports = router;
