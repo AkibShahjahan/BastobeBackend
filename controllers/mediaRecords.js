@@ -15,7 +15,11 @@ router.delete("/delete", function(req, res){
 router.get("/", function(req, res){
 	MediaRecord.find({}, function(err, mediaRecords){
 		if(err) {
-			res.json({error: "Finding failed."});
+			res.status(400);
+			res.json({error: err});
+		} else if (!mediaRecords) {
+			res.status(404);
+			res.json({error: "Not Found"});
 		}
 		else {
 			res.send(mediaRecords);
@@ -27,7 +31,10 @@ router.get("/:mediaId", function(req, res){
 	MediaRecord.findOne({"mediaId": req.params.mediaId}, function(err, mediaRecord){
 		if(err) {
 			res.status(400);
-			res.json({error: "Finding failed."});
+			res.json({error: err});
+		} else if(!mediaRecord) {
+			res.status(404);
+			res.json({error: "Not Found"});
 		} else {
 			res.status(200);
 			res.send(mediaRecord);
@@ -39,7 +46,10 @@ router.get("/:mediaId/liked/:userId", function(req, res){
   MediaRecord.findOne({"mediaId": req.params.mediaId}, function(err, mediaRecord){
 		if(err) {
 			res.status(400);
-			res.json({error: "Finding failed."});
+			res.json({error: err});
+		} else if(!mediaRecord) {
+			res.status(404);
+			res.json({error: "Not Found"});
 		} else {
 			res.status(200);
 			if(mediaRecord.likeRecord.indexOf(req.params.userId) != -1) {
@@ -55,7 +65,10 @@ router.get("/:mediaId/viewed/:userId", function(req, res){
   MediaRecord.findOne({"mediaId": req.params.mediaId}, function(err, mediaRecord){
 		if(err) {
 			res.status(400);
-			res.json({error: "Finding failed."});
+			res.json({error: err});
+		} else if(!mediaRecord) {
+			res.status(404);
+			res.json({error: "Not Found"});
 		} else {
 			res.status(200);
 			if(mediaRecord.viewRecord.indexOf(req.params.userId) != -1) {
@@ -71,7 +84,10 @@ router.get("/:mediaId/spreaded/:userId", function(req, res){
   MediaRecord.findOne({"mediaId": req.params.mediaId}, function(err, mediaRecord){
 		if(err) {
 			res.status(400);
-			res.json({error: "Finding failed."});
+			res.json({error: err});
+		} else if(!mediaRecord) {
+			res.status(404);
+			res.json({error: "Not Found"});
 		} else {
 			res.status(200);
 			if(mediaRecord.spreadRecord.indexOf(req.params.userId) != -1) {

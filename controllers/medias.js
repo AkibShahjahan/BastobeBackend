@@ -4,15 +4,18 @@ var Media = require("../models/media");
 var User = require("../models/user");
 var MediaRecord = require("../models/mediaRecord");
 var UserRecord = require("../models/userRecord");
-
+var Points = require("./points.js");
 
 router.get("/", function(req, res){
 	Media.find({}, function(err, medias){
 		if(err) {
-			res.json({error: "Finding failed."});
-		}
-		else {
-			res.send(medias);
+			res.status(400);
+			res.json({error: err});
+		} else if(!medias) {
+			res.status(404);
+			res.json({error: "Not Found"});
+		} else {
+			res.json(medias);
 		}
 	});
 });
@@ -23,27 +26,32 @@ router.get("/", function(req, res){
 router.delete("/delete", function(req, res){
 	Media.remove({}, function(err, medias){
 		if(!err) {
+			res.send(200);
 			res.json({success: "All entities have been removed."});
 		} else {
+			res.send(400);
 			res.json({error: "Sorry, the deletion was not successful"})
 		}
 	})
 });
 // =============================================================
 
-// global feed
 router.get("/feed/global", function(req, res){
 	 Media.find({}).sort({time: -1}).exec(function(err, medias) {
 		 if(err) {
 			 // NOT SURE ABOUT THIS
  			 res.status(400);
+			 res.json({error: err});
+		 } else if(!medias){
+			 res.status(404);
+			 res.json({error: "Not Found"});
 		 } else {
+			 res.status(200);
 			 res.json(medias);
 		 }
 	 });
 });
 
-// local feed
 router.get("/feed/:x/:y", function(req, res){
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
@@ -55,18 +63,27 @@ router.get("/feed/:x/:y", function(req, res){
 											if(err) {
 												// NOT SURE ABOUT THIS
 												res.status(400);
+												res.json({error: err});
+											} else if(!medias) {
+												res.status(404);
+												res.json({error: "Not Found"});
 											} else {
+												res.status(200);
 												res.json(medias);
 											}
 	});
 });
 
-// Send on ly first 100 (?)
+// Send only first 100 (?)
 router.get("/rank/global", function(req, res){
 	Media.find({}).sort({"generalInfo.likes": -1}).sort({time: -1}).exec(function(err, medias) {
 		if(err) {
 			// NOT SURE ABOUT THIS
 			res.status(400);
+			res.json({error: err});
+		} else if(!medias) {
+			res.status(404);
+			res.json({error: "Not Found"});
 		} else {
 			if(medias.length >= 100){
 				res.json(medias.slice(0, 100));
@@ -77,7 +94,6 @@ router.get("/rank/global", function(req, res){
 	});
 });
 
-// Need to test this
 router.get("/rank/:x/:y", function(req, res){
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
@@ -89,8 +105,13 @@ router.get("/rank/:x/:y", function(req, res){
 											if(err) {
 												// NOT SURE ABOUT THIS
 												res.status(400);
+												res.json({error: err});
+											} else if(!medias) {
+												res.status(404);
+												res.json({error: "Not Found"});
 											} else {
-												res.send(medias);
+												res.status(200);
+												res.json(medias);
 											}
 	});
 });
@@ -98,8 +119,11 @@ router.get("/rank/:x/:y", function(req, res){
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
 		if(!media) {
+			res.status(404);
+			res.json({error: "Not Found"});
+		} else if (err) {
 			res.status(400);
-			res.json({error: "Finding failed."});
+			res.json({error: err});
 		} else {
 			res.status(200);
 			res.send(media);
@@ -112,6 +136,7 @@ router.post("/", function(req, res){
 	if(req.body.hasOwnProperty("creator_id") && req.body.hasOwnProperty("caption_label")
 	&& req.body.hasOwnProperty("author") && req.body.hasOwnProperty("cord_x")
 	&& req.body.hasOwnProperty("cord_y") && req.body.hasOwnProperty("media_type")) {
+		// Create the media object
 		var date= new Date();
 		var currentTime = date.toUTCString();
 		var newMedia = {
@@ -127,17 +152,20 @@ router.post("/", function(req, res){
 				y: req.body.cord_y
 			},
 			date: currentTime,
-			// _id doesn't work ---- source: "http://s3.amazonaws.com/bastobe/sample/"+_id+".png",
 			views: 0,
 			mediaType: req.body.media_type
 		};
-
+		// Create the media
 		Media.create(newMedia, function(err, newCreation) {
 			if(err) {
-				res.json({error: "Creation failed."});
+				res.status(400);
+				res.json({error: "Creation failed"});
 			} else {
+
+				// TODO: Create a helper function for this part
 				var newMediaId = newCreation._id.toString();
 
+				// Create media record object
 				var newMediaRecord = {
 					mediaId: newMediaId,
 					likeRecord: [],
@@ -147,13 +175,15 @@ router.post("/", function(req, res){
 
 				MediaRecord.create(newMediaRecord, function(err, newRecordCreation) {
 					if(err) {
+						res.send(400);
 						res.json({error: "Creation failed."});
 						//
 						//
-						// NEED TO DO SOMETHING HERE TO AVOID ANY PROBLEMS
+						// TODO: Delete the media
 						//
 						//
 					} else {
+						res.send(200);
 						res.send(newMediaId);
 					}
 				});
@@ -172,48 +202,21 @@ router.delete("/:id", function(req, res){
 		if(!media) {
 			res.status(404);
 			res.json({error: "No user with that object id"});
+		} else if (err) {
+			res.status(400);
+			res.json({error: err});
+		} else {
+			media.remove(function(err){
+				if(err) {
+					res.json({error: "Deletion failed."});
+				}
+				else {
+					res.json({success: "User deleted"});
+				}
+			});
 		}
-		media.remove(function(err){
-			if(err) {
-				res.json({error: "Deletion failed."});
-			}
-			else {
-				res.json({success: "User deleted"});
-			}
-		});
 	});
 });
-
-
-// Obsolete
-// router.put("/:id/likes/like", function(req, res){
-// 	User.findById(req.params.id, function(err, user){
-// 		if(err) {
-// 			res.status(404);
-// 			res.json({error: "No user with that object id"});
-// 		} else {
-// 			var modifiedUser = {
-// 				facebook: {
-// 					id: user.facebook.id,
-// 					email: user.facebook.email,
-// 					firstName: user.facebook.firstName,
-// 					lastName: user.facebook.lastName
-// 				},
-// 				points: user.points+1
-// 			};
-// 			User.findByIdAndUpdate(req.params.id, modifiedUser, function(err, updatedUser){
-// 				if(err){
-// 					res.status(404);
-// 					res.json({error: "No user with that object id"});
-// 				} else {
-// 					res.status(200);
-// 					res.send(modifiedUser);
-// 				}
-// 			})
-// 		}
-// 	})
-// });
-
 
 // TODO: MIGHT BE ABLE TO CREATE A COMMON HELPER FOR THESE 4 ROUTES
 
@@ -224,25 +227,21 @@ router.put("/view", function(req, res){
 		Media.findById(mediaId, function(err, foundMedia){
 			if (err) {
 				res.status(400);
+				res.json({error: err});
 			} else if (!foundMedia) {
 				res.status(404);
+				res.json({error: "Not Found"});
 			} else {
-				foundMedia.generalInfo.views++;
-				foundMedia.save(function(err, savedMedia) {
-					if(err) {
-
+				MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+					if(foundMediaRecord.viewRecordindexOf(viewerId)==-1) {
+						foundMedia.generalInfo.views++;
+						foundMedia.save();
+						foundMediaRecord.viewRecord.push(viewerId);
+						foundMediaRecord.save();
+						Points.updatePointsWithLevel(viewerId, "View");
+						res.send("Media successfully viewed");
 					} else {
-						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
-							foundMediaRecord.viewRecord.push(viewerId);
-							foundMediaRecord.save(function(err, savedMediaRecord) {
-								if(err){
-
-								} else {
-									res.send("Successfully viewed.");
-								}
-
-							});
-						})
+						res.send("Media already viewed");
 					}
 				});
 			}
@@ -275,38 +274,38 @@ router.put("/spread", function(req, res){
 
 					// this condition is needed incase two people spread same thing to user
 					if(foundUserRecord.spreadRecord.indexOf(req.body.media_id) == -1) {
-						console.log("XXX");
 						foundUserRecord.spreadRecord.push(req.body.media_id);
 						foundUserRecord.save();
 
 						Media.findById(mediaId, function(err, foundMedia){
 							if(err) {
 								res.status(400);
+								res.json({error: err});
 							} else if (!foundMedia) {
 								res.status(404);
+								res.json({error: "Not Found"});
 							} else {
-
 								foundMedia.generalInfo.spreads++;
 								foundMedia.save(function(err, savedMedia) {
 									if(err) {
-
+										res.status(400);
+										res.json({error: err});
 									} else {
+										res.status(200);
 										res.send("Successfully spreaded.");
 									}
 								});
 							}
 						});
 					} else {
+						res.status(200);
 						res.send("Media already spreaded previously.");
-						// do nothing
 					}
 				} else {
 					// skip this one and move on to the next one
 				}
-			})
-		//	res.send({success:"Media has been spreaded."});
+			});
 		}
-
 	} else {
 		res.status(400);
 		res.json({error: "The PUT request must have 'spreader_id', 'media_id', and 'friends_list' keys."});
@@ -320,20 +319,24 @@ router.put("/like", function(req, res){
 		Media.findById(mediaId, function(err, foundMedia){
 			if (err) {
 				res.status(400);
+				res.json({error: err});
 			} else if (!foundMedia) {
 				res.status(404);
+				res.json({error: "Not Found"});
 			} else {
 				foundMedia.generalInfo.likes++;
 				foundMedia.save(function(err, savedMedia) {
 					if(err) {
-
+						res.status(400);
+						res.json({error: err});
 					} else {
 						// maybe should check if already liked or not
 						MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
 							foundMediaRecord.likeRecord.push(likerId);
 							foundMediaRecord.save(function(err, savedMediaRecord) {
 								if(err){
-
+									res.status(400);
+									res.json({error: err});
 								} else {
 									UserRecord.findOne({"userId": likerId}, function(err, foundUserRecord){
 										if(foundUserRecord != null) {
@@ -341,7 +344,11 @@ router.put("/like", function(req, res){
 												foundUserRecord.likeRecord.push(req.body.media_id);
 												foundUserRecord.save(function(err, savedUser){
 													if(!savedUser){
+														res.status(400)
 														res.send("Unsuccessful");
+													} else if (err) {
+														res.status(400)
+														res.json({error: err});
 													} else {
 														res.send("Successfully liked.");
 													}
@@ -382,18 +389,20 @@ router.put("/unlike", function(req, res) {
 							foundMediaRecord.likeRecord.pull(unlikerId);
 							foundMediaRecord.save(function(err, savedMediaRecord) {
 								if(err){
-
+									res.status(400);
+									res.json({error: err});
 								} else {
 									UserRecord.findOne({"userId": unlikerId}, function(err, foundUserRecord){
-										if(!foundUserRecord)
-										{
-
+										if(!foundUserRecord) {
+											res.status(404);
+											res.json({error: "Not Found"});
 										}
 										else if (foundUserRecord != null) {
 											foundUserRecord.likeRecord.pull(req.body.media_id);
 											foundUserRecord.save();
 										} else {
-											// err
+											res.status(400);
+											res.json({error: err});
 										}
 									});
 									res.send("Successfully unliked.");
@@ -411,7 +420,9 @@ router.put("/unlike", function(req, res) {
 	}
 })
 
-
+// router.get("/test/one", function(res, res){
+// 	res.send(Points.updatePointsWithLevel("xo", "lmao"));
+// })
 
 
 

@@ -6,27 +6,10 @@ var express = require("express");
 var router = express.Router()
 var User = require("../models/user");
 
-// var levelNeg1 = -1; // View deduction
-// var level1 = 1; // Nothing as of yet
-// var level2 = 10; // Likes
-// var level3 = 10; // Spread
-
 var negTen = {value: -10, types: ["unlike"]};
 var negOne = {value: -1, types: ["view"]};
 var one = {value: 1, types: []};
 var ten = {value: 10, types: ["like", "spread"]};
-
-// function levelConversion(level) {
-// 	if(level == -1) {
-//     return levelNeg1;
-//   } else if(level == 1) {
-//     return level1;
-//   } else if(level == 2) {
-//     return level2;
-//   } else if(level == 3) {
-//     return level3;
-//   }
-// };
 
 function levelConversion(type) {
 	if(exists(negTen.types, type)) {
@@ -47,7 +30,6 @@ function exists(arr, type) {
 	return false;
 }
 
-
 router.get("/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
 		if(err) {
@@ -64,12 +46,15 @@ router.put("/:id", function(req, res){
 	if(req.body.hasOwnProperty("level"))
 	{
 		User.findById(req.params.id, function(err, foundUser){
-			if(err) {
+			if(!foundUser) {
 				res.status(404);
-  			res.json({error: "No user with that object id"});
-			}	else {
-				if(updatedPoints < 0) updatedPoints = 0;
+  			res.json({error: "Not Found"});
+			}	else if(err) {
+				res.status(400);
+				res.json({error: err});
+			} else {
         var updatedPoints = foundUser.points + levelConversion(req.body.level);
+				if(updatedPoints < 0) updatedPoints = 0;
 				foundUser.points = updatedPoints;
 				foundUser.save(function(err, updatedUser){
 					if(err) {
@@ -87,3 +72,25 @@ router.put("/:id", function(req, res){
 });
 
 module.exports = router;
+
+// module.exports = {
+//   updatePointsWithLevel: function (id, level) {
+// 		User.findById(id, function(err, foundUser){
+// 			if(!foundUser) {
+// 				// res.status(404);
+//   			// res.json({error: "Not Found"});
+// 			}	else if(err) {
+// 				// res.status(400);
+// 				// res.json({error: err});
+// 			} else {
+//         var updatedPoints = foundUser.points + levelConversion(req.body.level);
+// 				if(updatedPoints < 0) updatedPoints = 0;
+// 				foundUser.points = updatedPoints;
+// 				foundUser.save();
+// 			}
+// 		})
+//   },
+//   two: function() {
+//     return 'world';
+//   }
+// }

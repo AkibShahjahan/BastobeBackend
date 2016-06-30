@@ -36,7 +36,7 @@ var pointRoutes = require("./controllers/points");
 
 app.use("/users", userRoutes);
 app.use("/medias", mediaRoutes);
-app.use("/points", pointRoutes);
+//app.use("/points", pointRoutes);
 app.use("/mediaRecords", mediaRecordRoutes);
 app.use("/userRecords", userRecordRoutes);
 
