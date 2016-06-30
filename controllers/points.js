@@ -71,26 +71,26 @@ router.put("/:id", function(req, res){
 	}
 });
 
-module.exports = router;
+//module.exports = router;
 
-// module.exports = {
-//   updatePointsWithLevel: function (id, level) {
-// 		User.findById(id, function(err, foundUser){
-// 			if(!foundUser) {
-// 				// res.status(404);
-//   			// res.json({error: "Not Found"});
-// 			}	else if(err) {
-// 				// res.status(400);
-// 				// res.json({error: err});
-// 			} else {
-//         var updatedPoints = foundUser.points + levelConversion(req.body.level);
-// 				if(updatedPoints < 0) updatedPoints = 0;
-// 				foundUser.points = updatedPoints;
-// 				foundUser.save();
-// 			}
-// 		})
-//   },
-//   two: function() {
-//     return 'world';
-//   }
-// }
+module.exports = {
+  updatePointsWithLevel: function (id, level) {
+		User.findById(id, function(err, foundUser){
+			if(!foundUser) {
+				// res.status(404);
+  			// res.json({error: "Not Found"});
+			}	else if(err) {
+				// res.status(400);
+				// res.json({error: err});
+			} else {
+        var updatedPoints = foundUser.points + levelConversion(req.body.level);
+				if(updatedPoints < 0) updatedPoints = 0;
+				foundUser.points = updatedPoints;
+				foundUser.save();
+			}
+		})
+  },
+  two: function() {
+    return 'world';
+  }
+}
