@@ -50,7 +50,7 @@ router.get("/feed/global", function(req, res){
 			 res.json(medias);
 		 }
 	 });
-});
+}); 
 
 router.get("/feed/:x/:y", function(req, res){
 	var x = parseFloat(req.params.x);
