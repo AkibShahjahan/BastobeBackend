@@ -233,7 +233,7 @@ router.put("/view", function(req, res){
 				res.json({error: "Not Found"});
 			} else {
 				MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
-					if(foundMediaRecord.viewRecordindexOf(viewerId)==-1) {
+					if(foundMediaRecord.viewRecord.indexOf(viewerId)==-1) {
 						foundMedia.generalInfo.views++;
 						foundMedia.save();
 						foundMediaRecord.viewRecord.push(viewerId);
