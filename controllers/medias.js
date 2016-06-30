@@ -175,7 +175,7 @@ router.post("/", function(req, res){
 
 				MediaRecord.create(newMediaRecord, function(err, newRecordCreation) {
 					if(err) {
-						res.send(400);
+						res.status(400);
 						res.json({error: "Creation failed."});
 						//
 						//
@@ -183,7 +183,7 @@ router.post("/", function(req, res){
 						//
 						//
 					} else {
-						res.send(200);
+						res.status(200);
 						res.send(newMediaId);
 					}
 				});
@@ -211,7 +211,7 @@ router.delete("/:id", function(req, res){
 					res.json({error: "Deletion failed."});
 				}
 				else {
-					res.json({success: "User deleted"});
+					res.json({success: "Media deleted"});
 				}
 			});
 		}
