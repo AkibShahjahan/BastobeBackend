@@ -6,6 +6,8 @@ var MediaRecord = require("../models/mediaRecord");
 var UserRecord = require("../models/userRecord");
 var Points = require("../helpers/points");
 
+
+// =============================================================
 router.get("/", function(req, res){
 	Media.find({}, function(err, medias){
 		if(err) {
@@ -19,10 +21,6 @@ router.get("/", function(req, res){
 		}
 	});
 });
-
-
-
-// =============================================================
 router.delete("/delete", function(req, res){
 	Media.remove({}, function(err, medias){
 		if(!err) {
@@ -191,7 +189,8 @@ router.post("/", function(req, res){
 		});
 	} else {
 		res.status(400);
-		res.json({error: "The POST request must have 'creator_id' and 'data_source' keys."})
+		res.json({error: "The POST request must have 'creator_id', 'caption_label', \
+		'author', 'cord_x', 'cord_y', and 'media_type' keys."})
 	}
 });
 

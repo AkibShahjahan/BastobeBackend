@@ -15,7 +15,7 @@ router.get("/", function(req, res){
 		}
 		else {
 			res.status(200);
-			res.send(users);
+			res.json(users);
 		}
 	});
 })
