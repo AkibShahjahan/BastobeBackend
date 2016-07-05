@@ -62,7 +62,7 @@ router.post("/", function(req, res){
 				res.status(400);
 				res.json({error: "Creation failed"});
 			} else {
-        res.status(200);
+        res.status(201);
         res.json({response: "Creation successful"});
 			}
 		});

@@ -75,7 +75,45 @@ function getRecord(recordType, req, res) {
 				res.send(userRecord.commentRecord);
 			}
 		}
-	})
+	});
 }
+
+router.get("/:userId/liked/:mediaId", function(req, res){
+  UserRecord.findOne({"userId": req.params.userId}, function(err, userRecord){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else if(!userRecord) {
+			res.status(404);
+			res.json({error: "Not Found"});
+		} else {
+			res.status(200);
+			if(userRecord.likeRecord.indexOf(req.params.mediaId) != -1) {
+        res.send({"response": true});
+      } else {
+        res.send({"response": false});
+      }
+		}
+	});
+});
+
+router.get("/:mediaId/viewed/:userId", function(req, res){
+  MediaRecord.findOne({"mediaId": req.params.mediaId}, function(err, mediaRecord){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else if(!mediaRecord) {
+			res.status(404);
+			res.json({error: "Not Found"});
+		} else {
+			res.status(200);
+			if(mediaRecord.viewRecord.indexOf(req.params.userId) != -1) {
+        res.send({"response": true});
+      } else {
+        res.send({"response": false});
+      }
+		}
+	});
+});
 
 module.exports = router;

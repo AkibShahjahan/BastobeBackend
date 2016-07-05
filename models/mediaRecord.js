@@ -5,19 +5,20 @@ var mediaRecordSchema = new mongoose.Schema({
   viewRecord: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "View"
+      ref: "User"
     }
   ],
   likeRecord: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Like"
+			ref: "User"
 		}
 	],
+  // ids of users who have spreaded this, NOT ids of users who this has been spreaded to
   spreadRecord: [
     {
       type: mongoose.Schema.Types.ObjectId,
-			ref: "Spread"
+			ref: "User"
     }
   ]
 });
