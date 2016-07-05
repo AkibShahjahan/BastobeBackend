@@ -347,7 +347,7 @@ router.put("/like", function(req, res){
 	}
 });
 
-router.put("/unlike", function(req, res) { 
+router.put("/unlike", function(req, res) {
 	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("unliker_id")) {
 		var mediaId = req.body.media_id;
 		var unlikerId = req.body.unliker_id;
@@ -355,7 +355,7 @@ router.put("/unlike", function(req, res) {
 			if(foundMedia) {
 				MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
 					if(foundMediaRecord) {
-						if(foundMediaRecord.likeRecord.indexOf(unlikedId) != -1) {
+						if(foundMediaRecord.likeRecord.indexOf(unlikerId) != -1) {
 							foundMedia.generalInfo.likes--;
 							foundMedia.save();
 							foundMediaRecord.likeRecord.pull(unlikerId);
