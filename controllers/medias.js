@@ -172,7 +172,7 @@ router.post("/", function(req, res){
 				};
 
 				MediaRecord.create(newMediaRecord, function(err, newRecordCreation) {
-					if(err) {
+					if(!newRecordCreation) {
 						res.status(400);
 						res.json({error: "Creation failed."});
 						//
@@ -181,7 +181,7 @@ router.post("/", function(req, res){
 						//
 						//
 					} else {
-						res.status(200);
+						res.status(201);
 						res.send(newMediaId);
 					}
 				});
@@ -347,7 +347,7 @@ router.put("/like", function(req, res){
 	}
 });
 
-router.put("/unlike", function(req, res) {
+router.put("/unlike", function(req, res) { 
 	if(req.body.hasOwnProperty("media_id") && req.body.hasOwnProperty("unliker_id")) {
 		var mediaId = req.body.media_id;
 		var unlikerId = req.body.unliker_id;
