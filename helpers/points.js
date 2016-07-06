@@ -23,6 +23,11 @@ function levelConversion(type) {
 	}
 };
 
+function exists(arr, type) {
+	if(arr.indexOf(type) != -1) return true;
+	return false;
+}
+
 module.exports = {
   updatePointsWithLevel: function (id, level) {
 		User.findById(id, function(err, foundUser){
