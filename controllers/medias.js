@@ -194,7 +194,6 @@ router.post("/", function(req, res){
 	}
 });
 
-
 //TODO: delete the corresponding MediaRecord as well
 router.delete("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){

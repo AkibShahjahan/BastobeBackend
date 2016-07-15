@@ -99,6 +99,29 @@ router.get("/:mediaId/spreaded/:userId", function(req, res){
 	});
 });
 
+function getRecord(recordType, req, res) {
+	MediaRecord.findOne({"mediaId": req.params.mediaId}).populate(recordType)
+	.exec(function(err, mediaRecord){
+		if(err){
+			res.status(400);
+			res.json({error: err});
+		} else if (!mediaRecord) {
+			res.status(404);
+			res.json({error: "Not Found"});
+		} else {
+			res.status(200);
+			if(recordType=="commentRecord") {
+				// TODO: will have to change this to json
+				res.send(mediaRecord.commentRecord);
+			}
+		}
+	});
+}
+
+router.get("/:mediaId/comments", function(req, res) {
+	getRecord("commentRecord", req, res);
+})
+
 
 
 
