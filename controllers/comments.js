@@ -65,6 +65,7 @@ router.get("/:id", function(req, res){
 router.post("/", function(req, res){
   var creatorId = req.body.creator_id;
   var creatorFbId = req.body.creator_fbid;
+  var creatorName = req.body.creator_name;
   var mediaId = req.body.media_id;
   var commentContent = req.body.comment_content;
 	if(creatorId && creatorFbId && mediaId && commentContent) {
@@ -74,6 +75,7 @@ router.post("/", function(req, res){
 		var newComment = {
       creatorId: creatorId,
       creatorFbId: creatorFbId,
+      creatorName: creatorName,
       mediaId: mediaId,
       commentContent: commentContent,
 			date: currentTime,
@@ -104,7 +106,7 @@ router.post("/", function(req, res){
 	} else {
 		res.status(400);
 		res.json({error: "The POST request must have 'creator_id', 'creator_fbid', \
-    'media_id', and 'comment_content' keys."})
+    'creator_name', 'media_id', and 'comment_content' keys."})
 	}
 });
 
