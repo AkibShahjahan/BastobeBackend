@@ -409,6 +409,7 @@ router.get("/comments/:mediaId", function(req, res){
 });
 
 router.post("/comments", function(req, res){
+	console.log("hello");
   var creatorId = req.body.creator_id;
   var creatorFbId = req.body.creator_fbid;
   var creatorName = req.body.creator_name;
