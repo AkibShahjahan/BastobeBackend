@@ -394,8 +394,9 @@ router.put("/unlike", function(req, res) {
 })
 
 router.get("/comments/:mediaId", function(req, res){
-  Comment.findOne({"mediaId": req.params.mediaId}, function(err, comment) {
-    if(!comment) {
+  MediaRecord.findOne({"mediaId": req.params.mediaId}).populate("commentRecord")
+	.exec(function(err, mediaRecord) {
+    if(!mediaRecord) {
 			res.status(404);
 			res.json({error: "Not Found"});
 		} else if (err) {
@@ -403,13 +404,12 @@ router.get("/comments/:mediaId", function(req, res){
 			res.json({error: err});
 		} else {
 			res.status(200);
-			res.send(comment);
+			res.send(mediaRecord.commentRecord);
 		}
   })
 });
 
 router.post("/comments", function(req, res){
-	console.log("hello");
   var creatorId = req.body.creator_id;
   var creatorFbId = req.body.creator_fbid;
   var creatorName = req.body.creator_name;
