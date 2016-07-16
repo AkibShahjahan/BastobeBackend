@@ -18,7 +18,13 @@ var mediaRecordSchema = new mongoose.Schema({
   spreadRecord: [
     {
       type: mongoose.Schema.Types.ObjectId,
-			ref: "Comment"
+			ref: "User"
+    }
+  ],
+  commentRecord: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
     }
   ]
 });

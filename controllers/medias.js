@@ -5,6 +5,7 @@ var User = require("../models/user");
 var MediaRecord = require("../models/mediaRecord");
 var UserRecord = require("../models/userRecord");
 var Points = require("../helpers/points");
+var Comment = require("../models/comment");
 
 
 // =============================================================
@@ -168,7 +169,8 @@ router.post("/", function(req, res){
 					mediaId: newMediaId,
 					likeRecord: [],
 					spreadRecord: [],
-					viewRecord: []
+					viewRecord: [],
+					commentRecord: []
 				};
 
 				MediaRecord.create(newMediaRecord, function(err, newRecordCreation) {
@@ -434,17 +436,30 @@ router.post("/comments", function(req, res){
         MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
           if(foundMediaRecord && foundMediaRecord.commentRecord.indexOf(newCommentId) == -1){
             foundMediaRecord.commentRecord.push(newCommentId);
-            foundMediaRecord.save();
+            foundMediaRecord.save(function(err, updatedMediaRecord){
+							if(updatedMediaRecord) {
+								UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
+									if(foundUserRecord && foundUserRecord.commentRecord.indexOf(mediaId) == -1){
+										foundUserRecord.commentRecord.push(mediaId);
+										foundUserRecord.save(function(err, updatedUserRecord){
+											if(updatedUserRecord) {
+												res.status(201);
+								        res.json({response: "Creation successful"});
+											} else {
+												res.status(400);
+												res.json({error: "Creation failed"});
+											}
+										});
+									} else {
+										res.status(400);
+										res.json({error: "Creation failed"});
+									}
+								})
+							}
+						});
           }
         })
-        UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
-          if(foundUserRecord && foundUserRecord.commentRecord.indexOf(mediaId) == -1){
-            foundUserRecord.commentRecord.push(mediaId);
-            foundUserRecord.save();
-          }
-        })
-        res.status(201);
-        res.json({response: "Creation successful"});
+
 			}
 		});
 	} else {
