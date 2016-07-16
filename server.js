@@ -32,11 +32,13 @@ var userRoutes = require("./controllers/users");
 var userRecordRoutes = require("./controllers/userRecords");
 var mediaRoutes = require("./controllers/medias");
 var mediaRecordRoutes = require("./controllers/mediaRecords");
+var commentRoutes = require("./controllers/comments");
 
 app.use("/users", userRoutes);
 app.use("/medias", mediaRoutes);
 app.use("/mediaRecords", mediaRecordRoutes);
 app.use("/userRecords", userRecordRoutes);
+app.use("/comments", commentRoutes);
 
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!

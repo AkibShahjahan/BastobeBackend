@@ -394,7 +394,7 @@ router.put("/unlike", function(req, res) {
 })
 
 router.get("/comments/:mediaId", function(req, res){
-  Comment.findOne({"mediaId": mediaId}, function(err, comment) {
+  Comment.findOne({"mediaId": req.params.mediaId}, function(err, comment) {
     if(!comment) {
 			res.status(404);
 			res.json({error: "Not Found"});
@@ -428,37 +428,26 @@ router.post("/comments", function(req, res){
 		};
 		// Create the comment
 		Comment.create(newComment, function(err, newCreation) {
+			console.log("CREATED");
 			if(err) {
 				res.status(400);
 				res.json({error: "Creation failed"});
 			} else {
         var newCommentId = newCreation._id.toString();
-        MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+				MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
           if(foundMediaRecord && foundMediaRecord.commentRecord.indexOf(newCommentId) == -1){
             foundMediaRecord.commentRecord.push(newCommentId);
-            foundMediaRecord.save(function(err, updatedMediaRecord){
-							if(updatedMediaRecord) {
-								UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
-									if(foundUserRecord && foundUserRecord.commentRecord.indexOf(mediaId) == -1){
-										foundUserRecord.commentRecord.push(mediaId);
-										foundUserRecord.save(function(err, updatedUserRecord){
-											if(updatedUserRecord) {
-												res.status(201);
-								        res.json({response: "Creation successful"});
-											} else {
-												res.status(400);
-												res.json({error: "Creation failed"});
-											}
-										});
-									} else {
-										res.status(400);
-										res.json({error: "Creation failed"});
-									}
-								})
-							}
-						});
+            foundMediaRecord.save();
           }
         })
+        UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
+          if(foundUserRecord && foundUserRecord.commentRecord.indexOf(mediaId) == -1){
+            foundUserRecord.commentRecord.push(mediaId);
+            foundUserRecord.save();
+          }
+        })
+        res.status(201);
+        res.json({response: "Creation successful"});
 
 			}
 		});

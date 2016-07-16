@@ -32,20 +32,20 @@ router.delete("/delete", function(req, res){
 	})
 });
 
-router.get("/:mediaId", function(req, res){
-  Comment.findOne({"mediaId": mediaId}, function(err, comment) {
-    if(!comment) {
-			res.status(404);
-			res.json({error: "Not Found"});
-		} else if (err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			res.status(200);
-			res.send(comment);
-		}
-  })
-});
+// router.get("/:mediaId", function(req, res){
+//   Comment.findOne({"mediaId": req.params.mediaId}, function(err, comment) {
+//     if(!comment) {
+// 			res.status(404);
+// 			res.json({error: "Not Found"});
+// 		} else if (err) {
+// 			res.status(400);
+// 			res.json({error: err});
+// 		} else {
+// 			res.status(200);
+// 			res.send(comment);
+// 		}
+//   })
+// });
 
 router.get("/:id", function(req, res){
 	Comment.findById(req.params.id, function(err, comment){

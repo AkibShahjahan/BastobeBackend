@@ -9,6 +9,7 @@ var userRecordSchema = new mongoose.Schema({
 			ref: "Media"
 		}
 	],
+  // media that has been spreaded to the user NOT by the user
   spreadRecord: [
     {
       type: mongoose.Schema.Types.ObjectId,
