@@ -141,7 +141,7 @@ router.post("/", function(req, res){
 		var newMedia = {
 			creatorId: req.body.creator_id,
 			generalInfo: {
-				likes: 0,
+				likes: 1,
 				spreads: 0,
 				caption: req.body.caption_label,
 				author: req.body.author
@@ -167,7 +167,7 @@ router.post("/", function(req, res){
 				// Create media record object
 				var newMediaRecord = {
 					mediaId: newMediaId,
-					likeRecord: [],
+					likeRecord: [req.body.creator_id],
 					spreadRecord: [],
 					viewRecord: [],
 					commentRecord: []
@@ -183,6 +183,8 @@ router.post("/", function(req, res){
 						//
 						//
 					} else {
+						// User liking their own media
+						Points.updatePointsWithLevel(req.body.creator_id, "Like");
 						res.status(201);
 						res.send(newMediaId);
 					}
