@@ -24,7 +24,7 @@ function levelConversion(type) {
 };
 
 function exists(arr, type) {
-	if(arr.indexOf(type) != -1) return true;
+	if(arr.indexOf(type.toLowerCase()) != -1) return true;
 	return false;
 }
 

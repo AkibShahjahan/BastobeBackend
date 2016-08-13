@@ -122,6 +122,19 @@ router.get("/:mediaId/comments", function(req, res) {
 	getRecord("commentRecord", req, res);
 })
 
+router.put("/comments/delete", function(req, res) {
+	if(req.body.hasOwnProperty("media_id")){
+		MediaRecord.findOne({"mediaId": req.body.media_id}, function(err, foundMediaRecord){
+			if(foundMediaRecord) {
+				foundMediaRecord.commentRecord = [];
+				foundMediaRecord.save(function(err, savedMediaRecord) {
+					res.send("Done");
+				});
+			}
+		})
+	}
+})
+
 
 
 
