@@ -110,18 +110,10 @@ router.get("/rank/:x/:y", function(req, res){
 												res.json({error: "Not Found"});
 											} else {
 												res.status(200);
-												res.json(parseMediaIds(medias));
+												res.json(medias);
 											}
 	});
 });
-
-function parseMediaIds(medias) {
-	var idList = [];
-	for(var i = 0; i<medias.length; i++) {
-		idList.push(medias[i]._id);
-	}
-	return idList;
-}
 
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){

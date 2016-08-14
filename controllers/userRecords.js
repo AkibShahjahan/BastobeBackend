@@ -57,7 +57,8 @@ router.get("/:userId/comments", function(req, res){
 });
 
 function getRecord(recordType, req, res) {
-	UserRecord.findOne({"userId": req.params.userId}).populate(recordType)
+	UserRecord.findOne({"userId": req.params.userId})
+	.populate({path: recordType, options: {sort: {time: -1}}})
 	.exec(function(err, userRecord){
 		if(err){
 			res.status(400);
