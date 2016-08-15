@@ -185,6 +185,14 @@ router.post("/", function(req, res){
 					} else {
 						// User liking their own media
 						Points.updatePointsWithLevel(req.body.creator_id, "Like");
+						UserRecord.findOne({"userId": req.body.creator_id}, function(err, foundUserRecord){
+							if(foundUserRecord) {
+								if(foundUserRecord.likeRecord.indexOf(mediaId) == -1) {
+									foundUserRecord.likeRecord.push(req.body.media_id);
+									foundUserRecord.save();
+								}
+							}
+						})
 						res.status(201);
 						res.send(newMediaId);
 					}
