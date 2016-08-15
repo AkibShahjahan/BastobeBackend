@@ -187,8 +187,8 @@ router.post("/", function(req, res){
 						Points.updatePointsWithLevel(req.body.creator_id, "Like");
 						UserRecord.findOne({"userId": req.body.creator_id}, function(err, foundUserRecord){
 							if(foundUserRecord) {
-								if(foundUserRecord.likeRecord.indexOf(mediaId) == -1) {
-									foundUserRecord.likeRecord.push(req.body.media_id);
+								if(foundUserRecord.likeRecord.indexOf(newMediaId) == -1) {
+									foundUserRecord.likeRecord.push(newMediaId);
 									foundUserRecord.save();
 								}
 							}
