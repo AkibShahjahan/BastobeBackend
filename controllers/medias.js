@@ -329,24 +329,28 @@ router.put("/spread", function(req, res){
 				foundMedia.generalInfo.spreads++;
 				foundMedia.save(function(err, savedMedia) {
 					Points.updatePointsWithLevel(foundMedia.creatorId, "Spread");
+					for(var i = 0; i < friendsListLength; i++) {
+						UserRecord.findOne({"userFbId": friendsList[i]}, function(err, foundUserRecord){
+							if(foundUserRecord) {
+
+								// this condition is needed incase two people spread same thing to user
+								var userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+								if(foundUserRecord.spreadRecord.indexOf(req.body.media_id) == -1 &&
+									 userBlockList.indexOf(foundMedia.creatorId) == -1 &&
+								   userBlockList.indexOf(req.body.spreader_id) == -1) {
+									foundUserRecord.spreadRecord.push(req.body.media_id);
+									foundUserRecord.save();
+								} else {
+									// skip this one and move on to the next one
+								}
+							} else {
+								// skip this one and move on to the next one
+							}
+						});
+					}
 				});
 			}
 		});
-		for(var i = 0; i < friendsListLength; i++) {
-			UserRecord.findOne({"userFbId": friendsList[i]}, function(err, foundUserRecord){
-				if(foundUserRecord) {
-					// this condition is needed incase two people spread same thing to user
-					if(foundUserRecord.spreadRecord.indexOf(req.body.media_id) == -1) {
-						foundUserRecord.spreadRecord.push(req.body.media_id);
-						foundUserRecord.save();
-					} else {
-						// skip this one and move on to the next one
-					}
-				} else {
-					// skip this one and move on to the next one
-				}
-			});
-		}
 		res.status(200);
 		res.json({response: "Media successfully spreaded"});
 	} else {
