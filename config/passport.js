@@ -30,7 +30,7 @@ module.exports = function(passport){
 	    				newUser.facebook.lastName = profile.name.familyName;
 	    				newUser.facebook.email = profile.displayName;
 	    				newUser.points = 1;
-							newUser.receivedMedias = [];
+							newUser.blockedUsers = [];
 	    				newUser.save(function(err){
 	    					if(err){
 	    						//res.status(500);

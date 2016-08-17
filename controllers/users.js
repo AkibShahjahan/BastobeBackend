@@ -83,6 +83,38 @@ router.post("/", function(req, res){
 	}
 });
 
+router.put("/block", function(req, res) {
+	var blockerId = req.body.blocker_id;
+	var blockedId = req.body.blocked_id;
+	if(blockerId && blockedId) {
+		User.findOne({"userId": blockerId}, function(err, foundUser){
+			if(err) {
+				res.status(400);
+				res.json({error: err});
+			} else if(!foundUser) {
+				res.status(404);
+				res.json({error: "Not Found"});
+			} else {
+				if(foundUser.blockedUsers.indexOf(blockedId) == -1) {
+					Points.updatePointsWithLevel(blockedId, "Block");
+					foundUser.blockedUsers.push(blockedId);
+					foundUser.save();
+					if(foundUser.blockedUsers.length >= 5) {
+						// TODO: do something ... maybe one day
+					}
+					res.json({success: "User successfuly blocked"});
+				} else {
+					res.json({success: "User already blocked"});
+				}
+				res.status(200);
+			}
+		});
+	} else {
+		res.status(400);
+		res.json({error: "The POST request must have 'blocker_id' and 'blocked_id' keys."});
+	}
+})
+
 router.delete("/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){
 		if(!user) {
