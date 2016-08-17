@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router()
 var Media = require("../models/media");
+var MediaHelper = require("../helpers/media");
 var User = require("../models/user");
 var MediaRecord = require("../models/mediaRecord");
 var UserRecord = require("../models/userRecord");
@@ -170,18 +171,15 @@ router.post("/", function(req, res){
 					likeRecord: [req.body.creator_id],
 					spreadRecord: [],
 					viewRecord: [],
-					commentRecord: []
+					commentRecord: [],
+					flagRecord: []
 				};
 
 				MediaRecord.create(newMediaRecord, function(err, newRecordCreation) {
 					if(!newRecordCreation) {
 						res.status(400);
 						res.json({error: "Creation failed."});
-						//
-						//
-						// TODO: Delete the media
-						//
-						//
+						MediaHelper.deleteMedia(newMediaId);
 					} else {
 						// User liking their own media
 						Points.updatePointsWithLevel(req.body.creator_id, "Like");
@@ -206,26 +204,9 @@ router.post("/", function(req, res){
 	}
 });
 
-//TODO: delete the corresponding MediaRecord as well
 router.delete("/:id", function(req, res){
-	Media.findById(req.params.id, function(err, media){
-		if(!media) {
-			res.status(404);
-			res.json({error: "No media with that object id"});
-		} else if (err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			media.remove(function(err){
-				if(err) {
-					res.json({error: "Deletion failed."});
-				}
-				else {
-					res.json({success: "Media deleted"});
-				}
-			});
-		}
-	});
+	var mediaId = req.params.id;
+	MediaHelper.deleteMedia(mediaId, res);
 });
 
 // TODO: MIGHT BE ABLE TO CREATE A COMMON HELPER FOR THESE 4 ROUTES

@@ -26,6 +26,18 @@ var mediaRecordSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "Comment"
     }
+  ],
+  // TODO: Adds to this list when another user flags _this media [1hr max]
+  //        - create endpoint that will take user id and media and add to this list (check if already flagged)
+  //        - frontend> when getting media, also stores media flagRecord
+  //                  > calls this endpoint if not already flagged
+  //        - If media gets more than X number of flags then media is automatically removed (use mediaDelete grand function tbc)
+  //        - Deduct points for getting flagged [additional 10mins probably]
+  flagRecord: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
   ]
 });
 

@@ -5,6 +5,7 @@
 var User = require("../models/user");
 
 var negTen = {value: -10, types: ["unlike"]};
+var negFive = {value: -5, types: ["flag"]}
 var negOne = {value: -1, types: ["view"]};
 var one = {value: 1, types: []};
 var ten = {value: 10, types: ["like", "spread"]};
@@ -12,6 +13,8 @@ var ten = {value: 10, types: ["like", "spread"]};
 function levelConversion(type) {
 	if(exists(negTen.types, type)) {
 		return negTen.value;
+	} else if(exists(negFive.types, type)){
+		return negFive.value;
 	} else if(exists(negOne.types, type)) {
     return negOne.value;
   } else if(exists(one.types, type)) {

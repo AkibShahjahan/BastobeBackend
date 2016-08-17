@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router()
 var MediaRecord = require("../models/mediaRecord");
+var MediaHelper = require("../helpers/media");
+var Points = require("../helpers/points");
 
 router.delete("/delete", function(req, res){
 	MediaRecord.remove({}, function(err, deletedRecords){
@@ -123,8 +125,9 @@ router.get("/:mediaId/comments", function(req, res) {
 })
 
 router.put("/comments/delete", function(req, res) {
-	if(req.body.hasOwnProperty("media_id")){
-		MediaRecord.findOne({"mediaId": req.body.media_id}, function(err, foundMediaRecord){
+	var mediaId = req.body.media_id;
+	if(mediaId){
+		MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord){
 			if(foundMediaRecord) {
 				foundMediaRecord.commentRecord = [];
 				foundMediaRecord.save(function(err, savedMediaRecord) {
@@ -132,6 +135,42 @@ router.put("/comments/delete", function(req, res) {
 				});
 			}
 		})
+	} else {
+		res.status(400);
+		res.json({error: "The POST request must have 'media_id' key."});
+	}
+})
+
+router.put("/flag", function(req, res) {
+	var mediaId = req.body.media_id;
+	var flaggerId = req.body.flagger_id;
+	var mediaCreatorId = req.body.media_creator_id;
+	if(mediaId && flaggerId) {
+		MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord){
+			if(err) {
+				res.status(400);
+				res.json({error: err});
+			} else if(!mediaRecord) {
+				res.status(404);
+				res.json({error: "Not Found"});
+			} else {
+				if(foundMediaRecord.flagRecord.indexOf(flaggerId) != -1) {
+					Points.updatePointsWithLevel(mediaCreatorId, "Flag");
+					foundMediaRecord.flagRecord.push(flaggerId);
+					foundMediaRecord.save();
+					if(foundMediaRecord.flagRecord.length >= 5) {
+						MediaHelper.deleteMedia(mediaId);
+					}
+					res.json({success: "Media successfuly flagged"});
+				} else {
+					res.json({success: "Media already flagged"});
+				}
+				res.status(200);
+			}
+		});
+	} else {
+		res.status(400);
+		res.json({error: "The POST request must have 'media_id', media_creator_id, and 'flagger_id' keys."});
 	}
 })
 
