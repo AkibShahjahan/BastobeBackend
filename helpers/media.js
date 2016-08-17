@@ -5,7 +5,6 @@ module.exports = {
   		if(media) {
   			media.remove();
         if(res) {res.json({success: "Media deleted"});}
-  			return "dfas";
   		} else if (!media) {
   			if(res) {res.json({error: "No media with that object id"});}
   		} else {

@@ -144,18 +144,18 @@ router.put("/comments/delete", function(req, res) {
 router.put("/flag", function(req, res) {
 	var mediaId = req.body.media_id;
 	var flaggerId = req.body.flagger_id;
-	var mediaCreatorId = req.body.media_creator_id;
+	var creatorId = req.body.creator_id;
 	if(mediaId && flaggerId) {
 		MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord){
 			if(err) {
 				res.status(400);
 				res.json({error: err});
-			} else if(!mediaRecord) {
+			} else if(!foundMediaRecord) {
 				res.status(404);
 				res.json({error: "Not Found"});
 			} else {
-				if(foundMediaRecord.flagRecord.indexOf(flaggerId) != -1) {
-					Points.updatePointsWithLevel(mediaCreatorId, "Flag");
+				if(foundMediaRecord.flagRecord.indexOf(flaggerId) == -1) {
+					Points.updatePointsWithLevel(creatorId, "Flag");
 					foundMediaRecord.flagRecord.push(flaggerId);
 					foundMediaRecord.save();
 					if(foundMediaRecord.flagRecord.length >= 5) {

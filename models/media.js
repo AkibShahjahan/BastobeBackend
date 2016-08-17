@@ -29,7 +29,8 @@ mediaSchema.post('remove', function(next) {
   UserRecord.update({ commentRecord : {$in: [this._id]} }, {$pullAll: {commentRecord: [this._id]}}).exec();
   UserRecord.update({ spreadRecord : {$in: [this._id]} }, {$pullAll: {spreadRecord: [this._id]}}).exec();
   Comment.remove({mediaId: this._id}).exec();
-  MediaRecord.remove({ mediaId: this._id }, next);
+  MediaRecord.remove({ mediaId: this._id }).exec();
+  next;
 });
 
 var Media = mongoose.model("Media", mediaSchema);
