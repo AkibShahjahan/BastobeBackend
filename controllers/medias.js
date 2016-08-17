@@ -43,12 +43,11 @@ router.get("/feed/global/:userId", function(req, res){
 			// NOT SURE ABOUT THIS
 			res.status(400);
 			res.json({error: err});
-		} else if(!user){
-			res.status(404);
-			res.json({error: "Not Found"});
 		} else {
-			var userBlockList = user.blockedUsers;
-			Media.find({"_id": {$nin: userBlockList}}).sort({time: -1}).exec(function(err, medias) {
+			var userBlockList;
+			if(!user) { userBlockList = []; }
+			else { userBlockList = user.blockedUsers; }
+			Media.find({"creatorId": {$nin: userBlockList}}).sort({time: -1}).exec(function(err, medias) {
 	 		 if(err) {
 	 			 // NOT SURE ABOUT THIS
 	  			 res.status(400);
