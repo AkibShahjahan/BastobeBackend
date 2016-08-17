@@ -45,7 +45,9 @@ router.get("/feed/global/:userId", function(req, res){
 		} else {
 			var userBlockList;
 			if(!foundUserRecord) { userBlockList = []; }
-			else { userBlockList = foundUserRecord.blockedUsers; }
+			else {
+				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+			}
 			Media.find({"creatorId": {$nin: userBlockList}}).sort({time: -1}).exec(function(err, medias) {
 	 			if(err) {
 	  			res.status(400);
@@ -79,7 +81,9 @@ router.get("/feed/:x/:y/:userId", function(req, res){
 		} else {
 			var userBlockList;
 			if(!foundUserRecord) { userBlockList = []; }
-			else { userBlockList = foundUserRecord.blockedUsers; }
+			else {
+				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+			}
 			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
 											 	{"coordinate.x": {$lt: x + rad}},
 											 	{"coordinate.y": {$gt: y - rad}},
@@ -111,7 +115,9 @@ router.get("/rank/global/:userId", function(req, res){
 		} else {
 			var userBlockList;
 			if(!foundUserRecord) { userBlockList = []; }
-			else { userBlockList = foundUserRecord.blockedUsers; }
+			else {
+				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+			}
 			Media.find({"creatorId": {$nin: userBlockList}}).sort({"generalInfo.likes": -1})
 																											.sort({time: -1})
 																											.exec(function(err, medias) {
@@ -147,7 +153,9 @@ router.get("/rank/:x/:y/:userId", function(req, res){
 		} else {
 			var userBlockList;
 			if(!foundUserRecord) { userBlockList = []; }
-			else { userBlockList = foundUserRecord.blockedUsers; }
+			else {
+				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+			}
 			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
 											 	{"coordinate.x": {$lt: x + rad}},
 											 	{"coordinate.y": {$gt: y - rad}},
@@ -168,24 +176,6 @@ router.get("/rank/:x/:y/:userId", function(req, res){
 													}
 			});
 		}
-	});
-
-
-	Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
-									 	{"coordinate.x": {$lt: x + rad}},
-									 	{"coordinate.y": {$gt: y - rad}},
-									 	{"coordinate.y": {$lt: y + rad}}]}).sort({"generalInfo.likes": -1}).sort({time: -1}).exec(function(err, medias) {
-											if(err) {
-												// NOT SURE ABOUT THIS
-												res.status(400);
-												res.json({error: err});
-											} else if(!medias) {
-												res.status(404);
-												res.json({error: "Not Found"});
-											} else {
-												res.status(200);
-												res.json(medias);
-											}
 	});
 });
 

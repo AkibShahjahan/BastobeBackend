@@ -109,6 +109,14 @@ router.put("/block", function(req, res) {
 				res.status(200);
 			}
 		});
+		UserRecord.findOne({"userId": blockedId}, function(err, foundUserRecord){
+			if(foundUserRecord) {
+				if(foundUserRecord.blockedByUsers.indexOf(blockerId) == -1) {
+					foundUserRecord.blockedByUsers.push(blockerId);
+					foundUserRecord.save();
+				}
+			}
+		});
 	} else {
 		res.status(400);
 		res.json({error: "The POST request must have 'blocker_id' and 'blocked_id' keys."});
