@@ -29,8 +29,7 @@ module.exports = function(passport){
 	    				newUser.facebook.firstName = profile.name.givenName;
 	    				newUser.facebook.lastName = profile.name.familyName;
 	    				newUser.facebook.email = profile.displayName;
-	    				newUser.points = 1;
-							newUser.blockedUsers = [];
+	    				newUser.points = 100;
 	    				newUser.save(function(err){
 	    					if(err){
 	    						//res.status(500);
@@ -45,7 +44,8 @@ module.exports = function(passport){
 										userFbId: newUserFbId,
 										likeRecord: [],
 										spreadRecord: [],
-										commentRecord: []
+										commentRecord: [],
+										blockedUsers: []
 									};
 
 									UserRecord.create(newUserRecord, function(err, newRecordCreation) {

@@ -38,14 +38,14 @@ router.delete("/delete", function(req, res){
 
 router.get("/feed/global/:userId", function(req, res){
 	var userId = req.params.userId;
-	User.findById(userId, function(err, user){
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
 			res.status(400);
 			res.json({error: err});
 		} else {
 			var userBlockList;
-			if(!user) { userBlockList = []; }
-			else { userBlockList = user.blockedUsers; }
+			if(!foundUserRecord) { userBlockList = []; }
+			else { userBlockList = foundUserRecord.blockedUsers; }
 			Media.find({"creatorId": {$nin: userBlockList}}).sort({time: -1}).exec(function(err, medias) {
 	 			if(err) {
 	  			res.status(400);
@@ -54,8 +54,12 @@ router.get("/feed/global/:userId", function(req, res){
 	 			 	res.status(404);
 	 			 	res.json({error: "Not Found"});
 	 		 	} else {
-	 			 	res.status(200);
-	 			 	res.json(medias);
+					res.status(200);
+					if(medias.length >= 100){
+						res.json(medias.slice(0, 100));
+					} else {
+						res.json(medias);
+					}
 	 		 	}
 	 	 });
 		}
@@ -68,14 +72,14 @@ router.get("/feed/:x/:y/:userId", function(req, res){
 	var y = parseFloat(req.params.y);
 	var rad = 0.02;
 
-	User.findById(userId, function(err, user){
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
 			res.status(400);
 			res.json({error: err});
 		} else {
 			var userBlockList;
-			if(!user) { userBlockList = []; }
-			else { userBlockList = user.blockedUsers; }
+			if(!foundUserRecord) { userBlockList = []; }
+			else { userBlockList = foundUserRecord.blockedUsers; }
 			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
 											 	{"coordinate.x": {$lt: x + rad}},
 											 	{"coordinate.y": {$gt: y - rad}},
@@ -100,14 +104,14 @@ router.get("/feed/:x/:y/:userId", function(req, res){
 // Send only first 100 (?)
 router.get("/rank/global/:userId", function(req, res){
 	var userId = req.params.userId;
-	User.findById(userId, function(err, user){
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
 			res.status(400);
 			res.json({error: err});
 		} else {
 			var userBlockList;
-			if(!user) { userBlockList = []; }
-			else { userBlockList = user.blockedUsers; }
+			if(!foundUserRecord) { userBlockList = []; }
+			else { userBlockList = foundUserRecord.blockedUsers; }
 			Media.find({"creatorId": {$nin: userBlockList}}).sort({"generalInfo.likes": -1})
 																											.sort({time: -1})
 																											.exec(function(err, medias) {
@@ -118,6 +122,7 @@ router.get("/rank/global/:userId", function(req, res){
 	 			 	res.status(404);
 	 			 	res.json({error: "Not Found"});
 	 		 	} else {
+					res.status(200);
 					if(medias.length >= 100){
 						res.json(medias.slice(0, 100));
 					} else {
@@ -135,14 +140,14 @@ router.get("/rank/:x/:y/:userId", function(req, res){
 	var y = parseFloat(req.params.y);
 	var rad = 0.02;
 
-	User.findById(userId, function(err, user){
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
 			res.status(400);
 			res.json({error: err});
 		} else {
 			var userBlockList;
-			if(!user) { userBlockList = []; }
-			else { userBlockList = user.blockedUsers; }
+			if(!foundUserRecord) { userBlockList = []; }
+			else { userBlockList = foundUserRecord.blockedUsers; }
 			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
 											 	{"coordinate.x": {$lt: x + rad}},
 											 	{"coordinate.y": {$gt: y - rad}},
