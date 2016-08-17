@@ -40,7 +40,6 @@ router.get("/feed/global/:userId", function(req, res){
 	var userId = req.params.userId;
 	User.findById(userId, function(err, user){
 		if(err) {
-			// NOT SURE ABOUT THIS
 			res.status(400);
 			res.json({error: err});
 		} else {
@@ -48,68 +47,125 @@ router.get("/feed/global/:userId", function(req, res){
 			if(!user) { userBlockList = []; }
 			else { userBlockList = user.blockedUsers; }
 			Media.find({"creatorId": {$nin: userBlockList}}).sort({time: -1}).exec(function(err, medias) {
-	 		 if(err) {
-	 			 // NOT SURE ABOUT THIS
-	  			 res.status(400);
-	 			 res.json({error: err});
-	 		 } else if(!medias){
-	 			 res.status(404);
-	 			 res.json({error: "Not Found"});
-	 		 } else {
-	 			 res.status(200);
-	 			 res.json(medias);
-	 		 }
+	 			if(err) {
+	  			res.status(400);
+	 			 	res.json({error: err});
+	 			} else if(!medias){
+	 			 	res.status(404);
+	 			 	res.json({error: "Not Found"});
+	 		 	} else {
+	 			 	res.status(200);
+	 			 	res.json(medias);
+	 		 	}
 	 	 });
 		}
 	})
 });
 
-router.get("/feed/:x/:y", function(req, res){
+router.get("/feed/:x/:y/:userId", function(req, res){
+	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
 	var rad = 0.02;
-	Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
-									 	{"coordinate.x": {$lt: x + rad}},
-									 	{"coordinate.y": {$gt: y - rad}},
-									 	{"coordinate.y": {$lt: y + rad}}]}).sort({time: -1}).exec(function(err, medias) {
-											if(err) {
-												// NOT SURE ABOUT THIS
-												res.status(400);
-												res.json({error: err});
-											} else if(!medias) {
-												res.status(404);
-												res.json({error: "Not Found"});
-											} else {
-												res.status(200);
-												res.json(medias);
-											}
-	});
-});
 
-// Send only first 100 (?)
-router.get("/rank/global", function(req, res){
-	Media.find({}).sort({"generalInfo.likes": -1}).sort({time: -1}).exec(function(err, medias) {
+	User.findById(userId, function(err, user){
 		if(err) {
-			// NOT SURE ABOUT THIS
 			res.status(400);
 			res.json({error: err});
-		} else if(!medias) {
-			res.status(404);
-			res.json({error: "Not Found"});
 		} else {
-			if(medias.length >= 100){
-				res.json(medias.slice(0, 100));
-			} else {
-				res.json(medias);
-			}
+			var userBlockList;
+			if(!user) { userBlockList = []; }
+			else { userBlockList = user.blockedUsers; }
+			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
+											 	{"coordinate.x": {$lt: x + rad}},
+											 	{"coordinate.y": {$gt: y - rad}},
+											 	{"coordinate.y": {$lt: y + rad}},
+												{"creatorId": {$nin: userBlockList}}]}).sort({time: -1})
+												.exec(function(err, medias) {
+													if(err) {
+														res.status(400);
+														res.json({error: err});
+													} else if(!medias) {
+														res.status(404);
+														res.json({error: "Not Found"});
+													} else {
+														res.status(200);
+														res.json(medias);
+													}
+			});
 		}
 	});
 });
 
-router.get("/rank/:x/:y", function(req, res){
+// Send only first 100 (?)
+router.get("/rank/global/:userId", function(req, res){
+	var userId = req.params.userId;
+	User.findById(userId, function(err, user){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else {
+			var userBlockList;
+			if(!user) { userBlockList = []; }
+			else { userBlockList = user.blockedUsers; }
+			Media.find({"creatorId": {$nin: userBlockList}}).sort({"generalInfo.likes": -1})
+																											.sort({time: -1})
+																											.exec(function(err, medias) {
+	 			if(err) {
+	  			res.status(400);
+	 			 	res.json({error: err});
+	 			} else if(!medias){
+	 			 	res.status(404);
+	 			 	res.json({error: "Not Found"});
+	 		 	} else {
+					if(medias.length >= 100){
+						res.json(medias.slice(0, 100));
+					} else {
+						res.json(medias);
+					}
+	 		 	}
+	 	 });
+		}
+	})
+});
+
+router.get("/rank/:x/:y/:userId", function(req, res){
+	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
 	var rad = 0.02;
+
+	User.findById(userId, function(err, user){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else {
+			var userBlockList;
+			if(!user) { userBlockList = []; }
+			else { userBlockList = user.blockedUsers; }
+			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
+											 	{"coordinate.x": {$lt: x + rad}},
+											 	{"coordinate.y": {$gt: y - rad}},
+											 	{"coordinate.y": {$lt: y + rad}},
+												{"creatorId": {$nin: userBlockList}}]})
+												.sort({"generalInfo.likes": -1})
+												.sort({time: -1})
+												.exec(function(err, medias) {
+													if(err) {
+														res.status(400);
+														res.json({error: err});
+													} else if(!medias) {
+														res.status(404);
+														res.json({error: "Not Found"});
+													} else {
+														res.status(200);
+														res.json(medias);
+													}
+			});
+		}
+	});
+
+
 	Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
 									 	{"coordinate.x": {$lt: x + rad}},
 									 	{"coordinate.y": {$gt: y - rad}},
