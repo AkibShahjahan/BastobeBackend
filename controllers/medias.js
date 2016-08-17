@@ -36,20 +36,33 @@ router.delete("/delete", function(req, res){
 });
 // =============================================================
 
-router.get("/feed/global", function(req, res){
-	 Media.find({}).sort({time: -1}).exec(function(err, medias) {
-		 if(err) {
-			 // NOT SURE ABOUT THIS
- 			 res.status(400);
-			 res.json({error: err});
-		 } else if(!medias){
-			 res.status(404);
-			 res.json({error: "Not Found"});
-		 } else {
-			 res.status(200);
-			 res.json(medias);
-		 }
-	 });
+router.get("/feed/global/:userId", function(req, res){
+	var userId = req.params.userId;
+	User.findById(userId, function(err, user){
+		if(err) {
+			// NOT SURE ABOUT THIS
+			res.status(400);
+			res.json({error: err});
+		} else if(!user){
+			res.status(404);
+			res.json({error: "Not Found"});
+		} else {
+			var userBlockList = user.blockedUsers;
+			Media.find({"_id": {$nin: userBlockList}}).sort({time: -1}).exec(function(err, medias) {
+	 		 if(err) {
+	 			 // NOT SURE ABOUT THIS
+	  			 res.status(400);
+	 			 res.json({error: err});
+	 		 } else if(!medias){
+	 			 res.status(404);
+	 			 res.json({error: "Not Found"});
+	 		 } else {
+	 			 res.status(200);
+	 			 res.json(medias);
+	 		 }
+	 	 });
+		}
+	})
 });
 
 router.get("/feed/:x/:y", function(req, res){
