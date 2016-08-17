@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router()
 var User = require("../models/user");
 var UserRecord = require("../models/userRecord");
-
+var Points = require("../helpers/points");
 
 router.get("/", function(req, res){
 	User.find({}, function(err, users){
@@ -87,7 +87,7 @@ router.put("/block", function(req, res) {
 	var blockerId = req.body.blocker_id;
 	var blockedId = req.body.blocked_id;
 	if(blockerId && blockedId) {
-		User.findOne({"userId": blockerId}, function(err, foundUser){
+		User.findById(blockerId, function(err, foundUser){
 			if(err) {
 				res.status(400);
 				res.json({error: err});
