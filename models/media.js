@@ -21,7 +21,8 @@ var mediaSchema = new mongoose.Schema({
     default: Date.now
   },
   views: Number,
-  mediaType: String
+  mediaType: String,
+  active: Boolean
 });
 
 mediaSchema.post('remove', function(next) {

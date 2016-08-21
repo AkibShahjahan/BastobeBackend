@@ -48,7 +48,8 @@ router.get("/feed/global/:userId", function(req, res){
 			else {
 				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
 			}
-			Media.find({"creatorId": {$nin: userBlockList}}).sort({time: -1}).exec(function(err, medias) {
+			Media.find({$and: [{"creatorId": {$nin: userBlockList}},
+												{"active": {$ne: false}}]}).sort({time: -1}).exec(function(err, medias) {
 	 			if(err) {
 	  			res.status(400);
 	 			 	res.json({error: err});
@@ -88,7 +89,8 @@ router.get("/feed/:x/:y/:userId", function(req, res){
 											 	{"coordinate.x": {$lt: x + rad}},
 											 	{"coordinate.y": {$gt: y - rad}},
 											 	{"coordinate.y": {$lt: y + rad}},
-												{"creatorId": {$nin: userBlockList}}]}).sort({time: -1})
+												{"creatorId": {$nin: userBlockList}},
+												{"active": {$ne: false}}]}).sort({time: -1})
 												.exec(function(err, medias) {
 													if(err) {
 														res.status(400);
@@ -118,7 +120,8 @@ router.get("/rank/global/:userId", function(req, res){
 			else {
 				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
 			}
-			Media.find({"creatorId": {$nin: userBlockList}}).sort({"generalInfo.likes": -1})
+			Media.find({$and: [{"creatorId": {$nin: userBlockList}},
+												{"active": {$ne: false}}]}).sort({"generalInfo.likes": -1})
 																											.sort({time: -1})
 																											.exec(function(err, medias) {
 	 			if(err) {
@@ -160,7 +163,8 @@ router.get("/rank/:x/:y/:userId", function(req, res){
 											 	{"coordinate.x": {$lt: x + rad}},
 											 	{"coordinate.y": {$gt: y - rad}},
 											 	{"coordinate.y": {$lt: y + rad}},
-												{"creatorId": {$nin: userBlockList}}]})
+												{"creatorId": {$nin: userBlockList}},
+												{"active": {$ne: false}}]})
 												.sort({"generalInfo.likes": -1})
 												.sort({time: -1})
 												.exec(function(err, medias) {
@@ -205,7 +209,7 @@ router.post("/", function(req, res){
 		var newMedia = {
 			creatorId: req.body.creator_id,
 			generalInfo: {
-				likes: 1,
+				likes: 0,
 				spreads: 0,
 				caption: req.body.caption_label,
 				author: req.body.author
@@ -216,7 +220,8 @@ router.post("/", function(req, res){
 			},
 			date: currentTime,
 			views: 0,
-			mediaType: req.body.media_type
+			mediaType: req.body.media_type,
+			active: false
 		};
 		// Create the media
 		Media.create(newMedia, function(err, newCreation) {
@@ -244,16 +249,6 @@ router.post("/", function(req, res){
 						res.json({error: "Creation failed."});
 						MediaHelper.deleteMedia(newMediaId);
 					} else {
-						// User liking their own media
-						Points.updatePointsWithLevel(req.body.creator_id, "Like");
-						UserRecord.findOne({"userId": req.body.creator_id}, function(err, foundUserRecord){
-							if(foundUserRecord) {
-								if(foundUserRecord.likeRecord.indexOf(newMediaId) == -1) {
-									foundUserRecord.likeRecord.push(newMediaId);
-									foundUserRecord.save();
-								}
-							}
-						})
 						res.status(201);
 						res.send(newMediaId);
 					}
@@ -266,6 +261,37 @@ router.post("/", function(req, res){
 		'author', 'cord_x', 'cord_y', and 'media_type' keys."})
 	}
 });
+
+router.put("/activate", function(req, res) {
+	var mediaId = req.body.media_id;
+	var creatorId = req.body.creator_id;
+	if(mediaId && creatorId) {
+		Media.findById(mediaId, function(err, foundMedia) {
+			if(foundMedia) {
+				foundMedia.active = true;
+				foundMedia.generalInfo.likes = 1;
+				foundMedia.save();
+				Points.updatePointsWithLevel(creatorId, "Like");
+				// User liking their own media
+				UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
+					if(foundUserRecord) {
+						if(foundUserRecord.likeRecord.indexOf(mediaId) == -1) {
+							foundUserRecord.likeRecord.push(mediaId);
+							foundUserRecord.save();
+						}
+					}
+				})
+				res.status(200);
+			} else {
+				res.status(404);
+				res.json({error: "Media activation failed."});
+			}
+		})
+	} else {
+		res.status(400);
+		res.json({error: "The POST request must have 'creator_id' and 'media_id' keys."})
+	}
+})
 
 router.delete("/:id", function(req, res){
 	var mediaId = req.params.id;
