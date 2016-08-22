@@ -4,14 +4,15 @@ var UserRecord = require("../models/userRecord");
 var MediaRecord = require("../models/mediaRecord");
 var Comment = require("../models/comment");
 
-var cronInterval = "* * * * * *"; // run every ten minutes "0 */10 * * * *"
+var cronInterval = "0 */10 * * * *"; // run every ten minutes "0 */10 * * * *"
 
 var deleteOld = new CronJob(cronInterval, function() {
+  console.log("Running cron media deletion.");
   var currentTime = new Date().getTime();
   var duration = 1000*60*5; // should be 1000*60*60*24
   var deletionQuery =  {
     time: {
-      $gt: currentTime - duration //TODO: change to $lte
+      $lte: currentTime - duration //TODO: change to $lte
     }
   }
   Media.find(deletionQuery, function(err, medias){
@@ -19,7 +20,6 @@ var deleteOld = new CronJob(cronInterval, function() {
       console.log(err);
     } else {
       medias.forEach(function(media){
-        var mediaId = media._id
         media.remove();
       })
     }

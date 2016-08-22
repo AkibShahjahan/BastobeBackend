@@ -262,6 +262,31 @@ router.post("/", function(req, res){
 	}
 });
 
+router.delete("/:id", function(req, res){
+	var deleterId = req.body.deleter_id;
+	var mediaId = req.params.id;
+	if(deleterId) {
+		Media.findById(mediaId, function(err, media) {
+			if(media) {
+				if(media.creatorId == deleterId) {
+					media.remove();
+					res.status(200);
+					res.json({Success: "Media deleted."});
+				} else {
+					res.status(401);
+					res.json({error: "Unauthorized"});
+				}
+			} else {
+				res.status(404);
+				res.json({error: "Failed to delete media"});
+			}
+		})
+	} else {
+		res.status(400);
+		re.json({error: "The POST request must have deleter_id key"});
+	}
+});
+
 router.put("/activate", function(req, res) {
 	var mediaId = req.body.media_id;
 	var creatorId = req.body.creator_id;
@@ -292,11 +317,6 @@ router.put("/activate", function(req, res) {
 		res.json({error: "The POST request must have 'creator_id' and 'media_id' keys."})
 	}
 })
-
-router.delete("/:id", function(req, res){
-	var mediaId = req.params.id;
-	MediaHelper.deleteMedia(mediaId, res);
-});
 
 // TODO: MIGHT BE ABLE TO CREATE A COMMON HELPER FOR THESE 4 ROUTES
 

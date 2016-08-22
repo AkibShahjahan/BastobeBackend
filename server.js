@@ -41,8 +41,8 @@ app.use("/userRecords", userRecordRoutes);
 app.use("/comments", commentRoutes);
 
 // // Cron for deleting media objects after 24hrs
-// var MediaCron = require("./helpers/mediaCron");
-// MediaCron.deleteOld.start();
+var MediaCron = require("./helpers/mediaCron");
+MediaCron.deleteOld.start();
 
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!
