@@ -236,7 +236,8 @@ router.post("/", function(req, res){
 				// Create media record object
 				var newMediaRecord = {
 					mediaId: newMediaId,
-					likeRecord: [req.body.creator_id],
+					//XXlikeRecord: [req.body.creator_id],
+					likeRecord: [],
 					spreadRecord: [],
 					viewRecord: [],
 					commentRecord: [],
@@ -296,16 +297,16 @@ router.put("/activate", function(req, res) {
 				foundMedia.active = true;
 				foundMedia.generalInfo.likes = 1;
 				foundMedia.save();
-				Points.updatePointsWithLevel(creatorId, "Like");
 				// User liking their own media
-				UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
-					if(foundUserRecord) {
-						if(foundUserRecord.likeRecord.indexOf(mediaId) == -1) {
-							foundUserRecord.likeRecord.push(mediaId);
-							foundUserRecord.save();
-						}
-					}
-				})
+				//Points.updatePointsWithLevel(creatorId, "Like");
+				// UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
+				// 	if(foundUserRecord) {
+				// 		if(foundUserRecord.likeRecord.indexOf(mediaId) == -1) {
+				// 			foundUserRecord.likeRecord.push(mediaId);
+				// 			foundUserRecord.save();
+				// 		}
+				// 	}
+				// })
 				res.status(200);
 			} else {
 				res.status(404);
