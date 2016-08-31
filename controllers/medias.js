@@ -295,7 +295,7 @@ router.put("/activate", function(req, res) {
 		Media.findById(mediaId, function(err, foundMedia) {
 			if(foundMedia) {
 				foundMedia.active = true;
-				foundMedia.generalInfo.likes = 1;
+				//foundMedia.generalInfo.likes = 1;
 				foundMedia.save();
 				// User liking their own media
 				//Points.updatePointsWithLevel(creatorId, "Like");
