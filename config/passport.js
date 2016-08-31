@@ -29,7 +29,7 @@ module.exports = function(passport){
 	    				newUser.facebook.firstName = profile.name.givenName;
 	    				newUser.facebook.lastName = profile.name.familyName;
 	    				newUser.facebook.email = profile.displayName;
-	    				newUser.points = 100;
+	    				newUser.points = 10;
 	    				newUser.save(function(err){
 	    					if(err){
 	    						//res.status(500);

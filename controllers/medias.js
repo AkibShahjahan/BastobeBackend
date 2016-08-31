@@ -69,7 +69,20 @@ router.get("/feed/global/:userId", function(req, res){
 	})
 });
 
-router.get("/feed/:x/:y/:userId", function(req, res){
+function isLoggedIn(req, res, next) {
+
+    // if user is authenticated in the session, carry on
+    if (req.isAuthenticated()) {
+        return next();
+				console.log("Yelp");
+		} else {
+			console.log("Zelp");
+		}
+    // if they aren't redirect them to the home page
+    res.redirect('/');
+}
+
+router.get("/feed/:x/:y/:userId", isLoggedIn, function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
