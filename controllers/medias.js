@@ -69,6 +69,14 @@ router.get("/feed/global/:userId", function(req, res){
 	})
 });
 
+var passport = require('passport');
+var cookieParser = require("cookie-parser");
+var session = require('express-session');
+router.use(cookieParser());
+router.use(session({ secret: '9cfe46bb94433454454a281b0b4aba4d' }));
+router.use(passport.initialize());
+router.use(passport.session());
+
 function isLoggedIn(req, res, next) {
 
     // if user is authenticated in the session, carry on
