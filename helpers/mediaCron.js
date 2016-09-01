@@ -4,7 +4,7 @@ var UserRecord = require("../models/userRecord");
 var MediaRecord = require("../models/mediaRecord");
 var Comment = require("../models/comment");
 
-var cronInterval = "0 */10 * * * *"; // should be run every ten minutes "0 */10 * * * *"
+var cronInterval = "0 */5 * * * *"; // should be run every ten minutes "0 */10 * * * *"
 
 var deleteOld = new CronJob(cronInterval, function() {
   console.log("Running cron media deletion.");
