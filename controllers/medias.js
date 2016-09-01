@@ -266,6 +266,7 @@ router.post("/", function(req, res){
 router.delete("/:id", function(req, res){
 	var deleterId = req.body.deleter_id;
 	var mediaId = req.params.id;
+	console.log(deleterId);
 	if(deleterId) {
 		Media.findById(mediaId, function(err, media) {
 			if(media) {
@@ -284,7 +285,7 @@ router.delete("/:id", function(req, res){
 		})
 	} else {
 		res.status(400);
-		res.json({error: "The POST request must have deleter_id key "+ req.body.deleter_id});
+		res.json({error: "The DELETE request must have deleter_id key "+ req.params.id});
 	}
 });
 
