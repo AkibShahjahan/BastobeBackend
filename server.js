@@ -34,11 +34,11 @@ var mediaRoutes = require("./controllers/medias");
 var mediaRecordRoutes = require("./controllers/mediaRecords");
 var commentRoutes = require("./controllers/comments");
 
-app.use("/users", userRoutes);
-app.use("/medias", mediaRoutes);
-app.use("/mediaRecords", mediaRecordRoutes);
-app.use("/userRecords", userRecordRoutes);
-app.use("/comments", commentRoutes);
+app.use("/openapi/users", userRoutes);
+app.use("/openapi/medias", mediaRoutes);
+app.use("/openapi/mediaRecords", mediaRecordRoutes);
+app.use("/openapi/userRecords", userRecordRoutes);
+app.use("/openapi/comments", commentRoutes);
 
 // // Cron for deleting media objects after 24hrs
 var MediaCron = require("./helpers/mediaCron");
@@ -49,22 +49,6 @@ app.post('/login/facebook', passport.authenticate('facebook-token', {session: fa
     res.status(200)
     return res.json({status: 'OK'});
 });
-
-// app.get('/points/:id', function(req, res){
-// 	User.findById(req.params.id, function(err, user){
-// 		if(err)
-// 		{
-// 			//console.log(err);
-// 			res.status(400);
-// 			res.json({error: "Finding failed."});
-// 		}
-// 		else
-// 		{
-// 			res.status(200);
-// 			res.send(user.points.toString());
-// 		}
-// 	});
-// });
 
 app.get("/logout", function(req, res){
 	res.status(200);
