@@ -283,7 +283,7 @@ router.delete("/:id", function(req, res){
 			}
 		})
 	} else {
-		res.status(400);
+		res.status(404);
 		re.json({error: "The POST request must have deleter_id key"});
 	}
 });
