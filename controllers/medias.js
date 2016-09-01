@@ -263,8 +263,8 @@ router.post("/", function(req, res){
 	}
 });
 
-router.delete("/:id", function(req, res){
-	var deleterId = req.body.deleter_id;
+router.delete("/:id/:deleterId", function(req, res){
+	var deleterId = req.params.deleterId;
 	var mediaId = req.params.id;
 	console.log(deleterId);
 	if(deleterId) {
