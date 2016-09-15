@@ -565,4 +565,159 @@ router.post("/comments", function(req, res){
 	}
 });
 
+
+router.get("/photo/feed/global/:userId", function(req, res){
+	var userId = req.params.userId;
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else {
+			var userBlockList;
+			if(!foundUserRecord) { userBlockList = []; }
+			else {
+				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+			}
+			Media.find({$and: [{"creatorId": {$nin: userBlockList}},
+												{"active": {$ne: false}}]}).where("mediaType", "Photo")
+												.sort({time: -1}).exec(function(err, medias) {
+	 			if(err) {
+	  			res.status(400);
+	 			 	res.json({error: err});
+	 			} else if(!medias){
+	 			 	res.status(404);
+	 			 	res.json({error: "Not Found"});
+	 		 	} else {
+					res.status(200);
+					if(medias.length >= 100){
+						res.json(medias.slice(0, 100));
+					} else {
+						res.json(medias);
+					}
+	 		 	}
+	 	 });
+		}
+	})
+});
+
+router.get("/photo/feed/:x/:y/:userId", function(req, res){
+	var userId = req.params.userId;
+	var x = parseFloat(req.params.x);
+	var y = parseFloat(req.params.y);
+	var rad = 0.02;
+
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else {
+			var userBlockList;
+			if(!foundUserRecord) { userBlockList = []; }
+			else {
+				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+			}
+			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
+											 	{"coordinate.x": {$lt: x + rad}},
+											 	{"coordinate.y": {$gt: y - rad}},
+											 	{"coordinate.y": {$lt: y + rad}},
+												{"creatorId": {$nin: userBlockList}},
+												{"active": {$ne: false}}]}).where("mediaType", "Photo")
+												.sort({time: -1})
+												.exec(function(err, medias) {
+													if(err) {
+														res.status(400);
+														res.json({error: err});
+													} else if(!medias) {
+														res.status(404);
+														res.json({error: "Not Found"});
+													} else {
+														res.status(200);
+														res.json(medias);
+													}
+			});
+		}
+	});
+});
+
+// Send only first 100 (?)
+router.get("/photo/rank/global/:userId", function(req, res){
+	var userId = req.params.userId;
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else {
+			var userBlockList;
+			if(!foundUserRecord) { userBlockList = []; }
+			else {
+				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+			}
+			Media.find({$and: [{"creatorId": {$nin: userBlockList}},
+												{"active": {$ne: false}}]}).sort({"generalInfo.likes": -1})
+																											.where("mediaType", "Photo")
+																											.sort({time: -1})
+																											.exec(function(err, medias) {
+	 			if(err) {
+	  			res.status(400);
+	 			 	res.json({error: err});
+	 			} else if(!medias){
+	 			 	res.status(404);
+	 			 	res.json({error: "Not Found"});
+	 		 	} else {
+					res.status(200);
+					if(medias.length >= 100){
+						res.json(medias.slice(0, 100));
+					} else {
+						res.json(medias);
+					}
+	 		 	}
+	 	 });
+		}
+	})
+});
+
+router.get("/photo/rank/:x/:y/:userId", function(req, res){
+	var userId = req.params.userId;
+	var x = parseFloat(req.params.x);
+	var y = parseFloat(req.params.y);
+	var rad = 0.02;
+
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else {
+			var userBlockList;
+			if(!foundUserRecord) { userBlockList = []; }
+			else {
+				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
+			}
+			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
+											 	{"coordinate.x": {$lt: x + rad}},
+											 	{"coordinate.y": {$gt: y - rad}},
+											 	{"coordinate.y": {$lt: y + rad}},
+												{"creatorId": {$nin: userBlockList}},
+												{"active": {$ne: false}}]}).where("mediaType", "Photo")
+												.sort({"generalInfo.likes": -1})
+												.sort({time: -1})
+												.exec(function(err, medias) {
+													if(err) {
+														res.status(400);
+														res.json({error: err});
+													} else if(!medias) {
+														res.status(404);
+														res.json({error: "Not Found"});
+													} else {
+														res.status(200);
+														res.json(medias);
+													}
+			});
+		}
+	});
+});
+
+
+
+
+
 module.exports = router;
