@@ -35,6 +35,20 @@ router.get("/:id", function(req, res){
 	});
 });
 
+router.get("/:fbId", function(req, res){
+	User.findOne({"facebook.id": req.params.fbId}, function(err, user){
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else if(!user) {
+			res.status(404);
+			res.json({error: "Not Found"});
+		} else {
+			res.status(200);
+			res.send(user);
+		}
+	});
+});
 
 router.get("/:fbId/id", function(req, res){
 	User.findOne({"facebook.id": req.params.fbId}, function(err, user){
