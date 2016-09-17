@@ -35,7 +35,7 @@ router.get("/:id", function(req, res){
 	});
 });
 
-router.get("/:fbId", function(req, res){
+router.get("/user/:fbId", function(req, res){
 	User.findOne({"facebook.id": req.params.fbId}, function(err, user){
 		if(err) {
 			res.status(400);
