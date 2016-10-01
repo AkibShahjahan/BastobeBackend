@@ -45,18 +45,30 @@ router.get("/:userId", function(req, res){
 });
 
 router.get("/:userId/likes", function(req, res){
-	getRecord("likeRecord", req, res);
+	getRecord("likeRecord", req, res, false);
 });
 
 router.get("/:userId/spreads", function(req, res){
-	getRecord("spreadRecord", req, res);
+	getRecord("spreadRecord", req, res, false);
 });
 
 router.get("/:userId/comments", function(req, res){
-  getRecord("commentRecord", req, res);
+  getRecord("commentRecord", req, res, false);
 });
 
-function getRecord(recordType, req, res) {
+router.get("/:userId/likes/preview", function(req, res){
+	getRecord("likeRecord", req, res, true);
+});
+
+router.get("/:userId/spreads/preview", function(req, res){
+	getRecord("spreadRecord", req, res, true);
+});
+
+router.get("/:userId/comments/preview", function(req, res){
+  getRecord("commentRecord", req, res, true);
+});
+
+function getRecord(recordType, req, res, preview) {
 	UserRecord.findOne({"userId": req.params.userId})
 	.populate({path: recordType, options: {sort: {time: -1}}})
 	.exec(function(err, userRecord){
@@ -69,11 +81,35 @@ function getRecord(recordType, req, res) {
 		} else {
 			res.status(200);
 			if(recordType=="likeRecord") {
-				res.send(userRecord.likeRecord);
+				if(preview) {
+					if(userRecord.likeRecord.length > 0){
+						res.json([userRecord.likeRecord[0]._id]);
+					} else {
+						res.json([]);
+					}
+				} else {
+					res.send(userRecord.likeRecord);
+				}
 			} else if (recordType=="spreadRecord") {
-				res.send(userRecord.spreadRecord);
+				if(preview) {
+					if(userRecord.spreadRecord.length > 0){
+						res.json([userRecord.spreadRecord[0]._id]);
+					} else {
+						res.json([]);
+					}
+				} else {
+					res.send(userRecord.spreadRecord);
+				}
 			} else if (recordType=="commentRecord") {
-				res.send(userRecord.commentRecord);
+				if(preview) {
+					if(userRecord.commentRecord.length > 0){
+						res.json([userRecord.commentRecord[0]._id]);
+					} else {
+						res.json([]);
+					}
+				} else {
+					res.send(userRecord.commentRecord);
+				}
 			}
 		}
 	});
