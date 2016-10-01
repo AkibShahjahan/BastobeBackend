@@ -26,10 +26,10 @@ router.get("/", function(req, res){
 router.delete("/delete", function(req, res){
 	Media.remove({}, function(err, medias){
 		if(!err) {
-			res.send(200);
+			res.status(200);
 			res.json({success: "All entities have been removed."});
 		} else {
-			res.send(400);
+			res.status(400);
 			res.json({error: "Sorry, the deletion was not successful"})
 		}
 	})
@@ -38,6 +38,15 @@ router.delete("/delete", function(req, res){
 
 router.get("/feed/global/:userId", function(req, res){
 	var userId = req.params.userId;
+	globalFeed(userId, req, res, false);
+});
+
+router.get("/feed/global/:userId/preview", function(req, res){
+	var userId = req.params.userId;
+	globalFeed(userId, req, res, true);
+});
+
+function globalFeed(userId, req, res, preview) {
 	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
 			res.status(400);
@@ -58,23 +67,42 @@ router.get("/feed/global/:userId", function(req, res){
 	 			 	res.json({error: "Not Found"});
 	 		 	} else {
 					res.status(200);
-					if(medias.length >= 100){
-						res.json(medias.slice(0, 100));
+					if(preview) {
+						if(medias.length > 0){
+							res.json([medias[0]._id]);
+						} else {
+							res.json([]);
+						}
 					} else {
-						res.json(medias);
+						if(medias.length >= 100){
+							res.json(medias.slice(0, 100));
+						} else {
+							res.json(medias);
+						}
 					}
 	 		 	}
 	 	 });
 		}
 	})
-});
+}
 
 router.get("/feed/:x/:y/:userId", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
 	var rad = 0.02;
+	localFeed(userId, x, y, rad, req, res, false);
+});
 
+router.get("/feed/:x/:y/:userId/preview", function(req, res){
+	var userId = req.params.userId;
+	var x = parseFloat(req.params.x);
+	var y = parseFloat(req.params.y);
+	var rad = 0.02;
+	localFeed(userId, x, y, rad, req, res, true);
+});
+
+function localFeed(userId, x, y, rad, req, res, preview) {
 	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
 			res.status(400);
@@ -86,9 +114,9 @@ router.get("/feed/:x/:y/:userId", function(req, res){
 				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
 			}
 			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
-											 	{"coordinate.x": {$lt: x + rad}},
-											 	{"coordinate.y": {$gt: y - rad}},
-											 	{"coordinate.y": {$lt: y + rad}},
+												{"coordinate.x": {$lt: x + rad}},
+												{"coordinate.y": {$gt: y - rad}},
+												{"coordinate.y": {$lt: y + rad}},
 												{"creatorId": {$nin: userBlockList}},
 												{"active": {$ne: false}}]}).sort({time: -1})
 												.exec(function(err, medias) {
@@ -100,16 +128,32 @@ router.get("/feed/:x/:y/:userId", function(req, res){
 														res.json({error: "Not Found"});
 													} else {
 														res.status(200);
-														res.json(medias);
+														if(preview) {
+															if(medias.length > 0){
+																res.json([medias[0]._id]);
+															} else {
+																res.json([]);
+															}
+														}
+														else {
+															res.json(medias);
+														}
 													}
 			});
 		}
 	});
-});
+}
 
-// Send only first 100 (?)
 router.get("/rank/global/:userId", function(req, res){
 	var userId = req.params.userId;
+	globalRank(userId, req, res, false)
+});
+router.get("/rank/global/:userId/preview", function(req, res){
+	var userId = req.params.userId;
+	globalRank(userId, req, res, true)
+});
+
+function globalRank(userId, req, res, preview) {
 	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
 			res.status(400);
@@ -132,23 +176,41 @@ router.get("/rank/global/:userId", function(req, res){
 	 			 	res.json({error: "Not Found"});
 	 		 	} else {
 					res.status(200);
-					if(medias.length >= 100){
-						res.json(medias.slice(0, 100));
+					if(preview) {
+						if(medias.length > 0){
+							res.json([medias[0]._id]);
+						} else {
+							res.json([]);
+						}
 					} else {
-						res.json(medias);
+						if(medias.length >= 100){
+							res.json(medias.slice(0, 100));
+						} else {
+							res.json(medias);
+						}
 					}
 	 		 	}
 	 	 });
 		}
 	})
-});
+}
 
 router.get("/rank/:x/:y/:userId", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
 	var rad = 0.02;
+	localRank(userId, x, y, rad, req, res, false);
+});
+router.get("/rank/:x/:y/:userId/preview", function(req, res){
+	var userId = req.params.userId;
+	var x = parseFloat(req.params.x);
+	var y = parseFloat(req.params.y);
+	var rad = 0.02;
+	localRank(userId, x, y, rad, req, res, true);
+});
 
+function localRank(userId, x, y, rad, req, res, preview) {
 	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
 			res.status(400);
@@ -176,12 +238,21 @@ router.get("/rank/:x/:y/:userId", function(req, res){
 														res.json({error: "Not Found"});
 													} else {
 														res.status(200);
-														res.json(medias);
+														if(preview) {
+															if(medias.length > 0){
+																res.json([medias[0]._id]);
+															} else {
+																res.json([]);
+															}
+														}
+														else {
+															res.json(medias);
+														}
 													}
 			});
 		}
 	});
-});
+}
 
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
