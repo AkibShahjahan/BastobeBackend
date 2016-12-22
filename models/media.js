@@ -23,7 +23,8 @@ var mediaSchema = new mongoose.Schema({
   },
   views: Number,
   mediaType: String,
-  active: Boolean
+  active: Boolean,
+  pinned: Boolean
 });
 
 mediaSchema.post('remove', function(next) {

@@ -271,29 +271,36 @@ router.get("/:id", function(req, res){
 
 
 router.post("/", function(req, res){
-	if(req.body.hasOwnProperty("creator_id") && req.body.hasOwnProperty("creator_fb_id")&& req.body.hasOwnProperty("caption_label")
-	&& req.body.hasOwnProperty("author") && req.body.hasOwnProperty("cord_x")
-	&& req.body.hasOwnProperty("cord_y") && req.body.hasOwnProperty("media_type")) {
+	var creatorId = req.body.hasOwnProperty("creator_id");
+	var creatorFbId = req.body.hasOwnProperty("creator_fb_id");
+	var captionLabel = req.body.hasOwnProperty("caption_label");
+	var author = req.body.hasOwnProperty("author");
+	var cordX = req.body.hasOwnProperty("cord_x");
+	var cordY = req.body.hasOwnProperty("cord_y");
+	var mediaType = req.body.hasOwnProperty("media_type");
+	var pinned = req.body.hasOwnProperty("pinned");
+	if(creatorId && creatorFbId && captionLabel && author && cordX && cordY && mediaType && pinned) {
 		// Create the media object
 		var date= new Date();
 		var currentTime = date.toUTCString();
 		var newMedia = {
-			creatorId: req.body.creator_id,
-			creatorFbId: req.body.creator_fb_id,
+			creatorId: creatorId,
+			creatorFbId: creatorFbId,
 			generalInfo: {
 				likes: 0,
 				spreads: 0,
-				caption: req.body.caption_label,
-				author: req.body.author
+				caption: captionLabel,
+				author: author
 			},
 			coordinate: {
-				x: req.body.cord_x,
-				y: req.body.cord_y
+				x: cordX,
+				y: cordY
 			},
 			date: currentTime,
 			views: 0,
-			mediaType: req.body.media_type,
-			active: false
+			mediaType: mediaType,
+			active: false,
+			pinned: pinned
 		};
 		// Create the media
 		Media.create(newMedia, function(err, newCreation) {
