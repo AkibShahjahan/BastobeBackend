@@ -271,7 +271,7 @@ router.get("/:id", function(req, res){
 
 
 router.post("/", function(req, res){
-	if(req.body.hasOwnProperty("creator_id") && req.body.hasOwnProperty("caption_label")
+	if(req.body.hasOwnProperty("creator_id") && req.body("creator_fb_id")&& req.body.hasOwnProperty("caption_label")
 	&& req.body.hasOwnProperty("author") && req.body.hasOwnProperty("cord_x")
 	&& req.body.hasOwnProperty("cord_y") && req.body.hasOwnProperty("media_type")) {
 		// Create the media object
@@ -279,6 +279,7 @@ router.post("/", function(req, res){
 		var currentTime = date.toUTCString();
 		var newMedia = {
 			creatorId: req.body.creator_id,
+			creatorFbId: req.body.creator_fb_id,
 			generalInfo: {
 				likes: 0,
 				spreads: 0,
@@ -786,9 +787,5 @@ router.get("/photo/rank/:x/:y/:userId", function(req, res){
 		}
 	});
 });
-
-
-
-
 
 module.exports = router;

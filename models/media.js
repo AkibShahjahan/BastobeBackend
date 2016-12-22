@@ -6,6 +6,7 @@ var Comment = require("../models/comment");
 
 var mediaSchema = new mongoose.Schema({
   creatorId: String,
+  creatorFbId: String,
 	generalInfo: {
 		likes: Number,
 		spreads: Number,
