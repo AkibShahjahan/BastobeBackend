@@ -271,18 +271,14 @@ router.get("/:id", function(req, res){
 
 
 router.post("/", function(req, res){
-	var creatorId = req.body.hasOwnProperty("creator_id");
-	var creatorFbId = req.body.hasOwnProperty("creator_fb_id");
-	var captionLabel = req.body.hasOwnProperty("caption_label");
-	var author = req.body.hasOwnProperty("author");
-	var cordX = req.body.hasOwnProperty("cord_x");
-	var cordY = req.body.hasOwnProperty("cord_y");
-	var mediaType = req.body.hasOwnProperty("media_type");
-	var pinned = req.body.hasOwnProperty("pinned");
-	console.log("IIIIIIIIIIIIII");
-	console.log(creatorFbId);
-	console.log(creatorId);
-	console.log(pinned);
+	var creatorId = req.body.creator_id;
+	var creatorFbId = req.body.creator_fb_id;
+	var captionLabel = req.body.caption_label;
+	var author = req.body.author;
+	var cordX = req.body.cord_x;
+	var cordY = req.body.cord_y;
+	var mediaType = req.body.media_type;
+	var pinned = req.body.pinned;
 	if(creatorId && creatorFbId && captionLabel && author && cordX && cordY && mediaType && pinned) {
 		// Create the media object
 		var date= new Date();
