@@ -28,8 +28,13 @@ module.exports = function(passport){
 	    				newUser.facebook.token = accessToken;
 	    				newUser.facebook.firstName = profile.name.givenName;
 	    				newUser.facebook.lastName = profile.name.familyName;
-	    				newUser.facebook.email = profile.displayName;
+	    				newUser.facebook.email = profile.displayName; // BUGGGGG
 	    				newUser.points = 10;
+
+							var date= new Date();
+							var currentTime = date.toUTCString();
+							newUser.time = currentTime;
+							
 	    				newUser.save(function(err){
 	    					if(err){
 	    						//res.status(500);

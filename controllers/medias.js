@@ -90,7 +90,7 @@ router.get("/feed/:x/:y/:userId", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.02;
+	var rad = 0.06;
 	localFeed(userId, x, y, rad, req, res, false);
 });
 
@@ -98,7 +98,7 @@ router.get("/feed/:x/:y/:userId/preview", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.02;
+	var rad = 0.06;
 	localFeed(userId, x, y, rad, req, res, true);
 });
 
@@ -199,14 +199,14 @@ router.get("/rank/:x/:y/:userId", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.02;
+	var rad = 0.06;
 	localRank(userId, x, y, rad, req, res, false);
 });
 router.get("/rank/:x/:y/:userId/preview", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.02;
+	var rad = 0.06;
 	localRank(userId, x, y, rad, req, res, true);
 });
 
@@ -279,6 +279,16 @@ router.post("/", function(req, res){
 	var cordY = req.body.cord_y;
 	var mediaType = req.body.media_type;
 	var pinned = req.body.pinned;
+	console.log("Some Stuff: ");
+	console.log(creatorId);
+	console.log(creatorFbId);
+	console.log(captionLabel);
+	console.log(author);
+	console.log(cordX);
+	console.log(cordY);
+	console.log(mediaType);
+	console.log(pinned);
+	console.log("End of.")
 	if(creatorId && creatorFbId && captionLabel && author && cordX && cordY && mediaType && pinned) {
 		// Create the media object
 		var date= new Date();
@@ -683,7 +693,7 @@ router.get("/photo/feed/:x/:y/:userId", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.02;
+	var rad = 0.06;
 
 	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {
@@ -759,7 +769,7 @@ router.get("/photo/rank/:x/:y/:userId", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.02;
+	var rad = 0.06;
 
 	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
 		if(err) {

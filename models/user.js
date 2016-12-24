@@ -12,7 +12,11 @@ var userSchema = new mongoose.Schema({
 	points: {
 		type: Number,
 		default: 0
-	}
+	},
+	time : {
+    type : Date,
+    default: Date.now
+  }
 	// TODO: add a timestamp
 })
 
