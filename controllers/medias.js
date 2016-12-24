@@ -289,7 +289,7 @@ router.post("/", function(req, res){
 	console.log(mediaType);
 	console.log(pinned);
 	console.log("End of.")
-	if(creatorId && creatorFbId && captionLabel && author && cordX && cordY && mediaType && pinned) {
+	if(creatorId && creatorFbId && (captionLabel || captionLabel == "") && author && cordX && cordY && mediaType && pinned) {
 		// Create the media object
 		var date= new Date();
 		var currentTime = date.toUTCString();
