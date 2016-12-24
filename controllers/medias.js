@@ -68,11 +68,7 @@ function globalFeed(userId, req, res, preview) {
 	 		 	} else {
 					res.status(200);
 					if(preview) {
-						if(medias.length > 0){
-							res.json([medias[0]._id]);
-						} else {
-							res.json([]);
-						}
+						res.json(getMediaWithImageId(medias));
 					} else {
 						if(medias.length >= 100){
 							res.json(medias.slice(0, 100));
@@ -129,11 +125,7 @@ function localFeed(userId, x, y, rad, req, res, preview) {
 													} else {
 														res.status(200);
 														if(preview) {
-															if(medias.length > 0){
-																res.json([medias[0]._id]);
-															} else {
-																res.json([]);
-															}
+															res.json(getMediaWithImageId(medias));
 														}
 														else {
 															res.json(medias);
@@ -177,11 +169,7 @@ function globalRank(userId, req, res, preview) {
 	 		 	} else {
 					res.status(200);
 					if(preview) {
-						if(medias.length > 0){
-							res.json([medias[0]._id]);
-						} else {
-							res.json([]);
-						}
+						res.json(getMediaWithImageId(medias));
 					} else {
 						if(medias.length >= 100){
 							res.json(medias.slice(0, 100));
@@ -239,11 +227,7 @@ function localRank(userId, x, y, rad, req, res, preview) {
 													} else {
 														res.status(200);
 														if(preview) {
-															if(medias.length > 0){
-																res.json([medias[0]._id]);
-															} else {
-																res.json([]);
-															}
+															res.json(getMediaWithImageId(medias));
 														}
 														else {
 															res.json(medias);
@@ -252,6 +236,17 @@ function localRank(userId, x, y, rad, req, res, preview) {
 			});
 		}
 	});
+}
+
+function getMediaWithImageId(medias) {
+	var len = medias;
+	var retVal = [];
+	for(var i = 0; i<len; i++) {
+		if(medias[i].mediaType == "Photo") {
+			retVal[0] = medias[i]._id;
+		}
+	}
+	return retVal;
 }
 
 router.get("/:id", function(req, res){
@@ -279,16 +274,6 @@ router.post("/", function(req, res){
 	var cordY = req.body.cord_y;
 	var mediaType = req.body.media_type;
 	var pinned = req.body.pinned;
-	console.log("Some Stuff: ");
-	console.log(creatorId);
-	console.log(creatorFbId);
-	console.log(captionLabel);
-	console.log(author);
-	console.log(cordX);
-	console.log(cordY);
-	console.log(mediaType);
-	console.log(pinned);
-	console.log("End of.")
 	if(creatorId && creatorFbId && (captionLabel || captionLabel == "") && author && cordX && cordY && mediaType && pinned) {
 		// Create the media object
 		var date= new Date();
