@@ -239,12 +239,12 @@ function localRank(userId, x, y, rad, req, res, preview) {
 }
 
 function getMediaWithImageId(medias) {
-	var len = medias;
+	var len = medias.length;
 	var retVal = [];
 	for(var i = 0; i<len; i++) {
 		if(medias[i].mediaType == "Photo") {
-			console.log("YELLOW FEEVER");
 			retVal[0] = medias[i]._id;
+			break;
 		}
 	}
 	return retVal;
