@@ -271,7 +271,7 @@ router.post("/", function(req, res){
 	var creatorFbId = req.body.creator_fb_id;
 	var captionLabel = req.body.caption_label;
 	var author = req.body.author;
-	var cordX = req.body.cord_x;
+	var cordX = 100;//req.body.cord_x;
 	var cordY = req.body.cord_y;
 	var mediaType = req.body.media_type;
 	var pinned = req.body.pinned;
