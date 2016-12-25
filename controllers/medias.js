@@ -243,6 +243,7 @@ function getMediaWithImageId(medias) {
 	var retVal = [];
 	for(var i = 0; i<len; i++) {
 		if(medias[i].mediaType == "Photo") {
+			console.log("YELLOW FEEVER");
 			retVal[0] = medias[i]._id;
 		}
 	}
