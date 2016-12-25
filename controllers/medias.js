@@ -271,7 +271,7 @@ router.post("/", function(req, res){
 	var creatorFbId = req.body.creator_fb_id;
 	var captionLabel = req.body.caption_label;
 	var author = req.body.author;
-	var cordX = 100;//req.body.cord_x;
+	var cordX = req.body.cord_x;
 	var cordY = req.body.cord_y;
 	var mediaType = req.body.media_type;
 	var pinned = req.body.pinned;
@@ -596,7 +596,12 @@ router.post("/comments", function(req, res){
   var creatorName = req.body.creator_name;
   var mediaId = req.body.media_id;
   var commentContent = req.body.comment_content;
-	if(creatorId && creatorFbId && mediaId && commentContent) {
+	var userLat = req.body.user_lat;
+	var userLong = req.body.user_long;
+	var mediaLat = req.body.media_lat;
+	var mediaLong = req.body.media_long;
+	if(creatorId && creatorFbId && mediaId && commentContent && creatorName && userLat && userLong
+		&& mediaLat && mediaLong && MediaHelper.isWithinAccessRadius(mediaLat, mediaLong, userLat, userLong)) {
 		// Create the comment object
 		var date= new Date();
 		var currentTime = date.toUTCString();
@@ -636,7 +641,7 @@ router.post("/comments", function(req, res){
 	} else {
 		res.status(400);
 		res.json({error: "The POST request must have 'creator_id', 'creator_fbid', \
-    'creator_name', 'media_id', and 'comment_content' keys."})
+    'creator_name', 'media_id', 'comment_content', 'cord_x', and 'cord_y' keys. Or you may not be in the access radius."})
 	}
 });
 

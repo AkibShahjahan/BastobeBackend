@@ -12,4 +12,11 @@ module.exports = {
   		}
   	});
   }
+  isWithinAccessRadius: function(mediaLat, mediaLong, userLat, userLong) {
+    let accessRadius = 0.06;
+    if(userLat > mediaLat - accessRadius && userLat < mediaLat + accessRadius && userLong > mediaLong - accessRadius && userLong < mediaLong + accessRadius) {
+        return true;
+    }
+    return false;
+  }
 }
