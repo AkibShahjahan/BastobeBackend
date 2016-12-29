@@ -65,38 +65,6 @@ router.get("/:fbId/id", function(req, res){
 	});
 });
 
-
-// FOR DEVELOPERS ONLY ========================================================
-router.post("/", function(req, res){
-	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") &&
-		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email")) {
-		var newUser = {
-			facebook: {
-				id: req.body.fb_id,
-				email: req.body.email,
-				firstName: req.body.first_name,
-				lastName: req.body.last_name,
-				token: "DeveloperToken"
-			},
-			points: 10,
-			receivedMedias: []
-		};
-
-		User.create(newUser, function(err, newCreation){
-			if(err) {
-				res.status(400);
-				res.json({error: "Creation failed."});
-			} else {
-				res.status(200);
-				res.json({newCreation});
-			}
-		});
-	} else {
-		res.status(400);
-		res.json({error: "The POST request must have 'fb_id', 'email', 'first_name', and 'last_name' keys."})
-	}
-});
-
 router.put("/block", function(req, res) {
 	var blockerId = req.body.blocker_id;
 	var blockedId = req.body.blocked_id;
@@ -137,13 +105,36 @@ router.put("/block", function(req, res) {
 	}
 })
 
-router.put("/block/empty/:id", function(req, res) {
-	User.findById(req.params.id, function(err, foundUser){
-		foundUser.blockedUsers = []
-		foundUser.save();
+// FOR DEVELOPERS ONLY ========================================================
+router.post("/", function(req, res){
+	if(req.body.hasOwnProperty("fb_id") && req.body.hasOwnProperty("first_name") &&
+		req.body.hasOwnProperty("last_name") && req.body.hasOwnProperty("email")) {
+		var newUser = {
+			facebook: {
+				id: req.body.fb_id,
+				email: req.body.email,
+				firstName: req.body.first_name,
+				lastName: req.body.last_name,
+				token: "DeveloperToken"
+			},
+			points: 10,
+			receivedMedias: []
+		};
 
-	});
-})
+		User.create(newUser, function(err, newCreation){
+			if(err) {
+				res.status(400);
+				res.json({error: "Creation failed."});
+			} else {
+				res.status(200);
+				res.json({newCreation});
+			}
+		});
+	} else {
+		res.status(400);
+		res.json({error: "The POST request must have 'fb_id', 'email', 'first_name', and 'last_name' keys."})
+	}
+});
 
 router.delete("/:id", function(req, res){
 	User.findById(req.params.id, function(err, user){

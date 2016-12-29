@@ -24,10 +24,6 @@ router.get("/", function(req, res){
 	});
 });
 
-router.get("/", function(req, res) {
-	res.json({success: "A LOT OF SUCCESS FOR YOU"});
-})
-
 router.delete("/delete", function(req, res){
 	Media.remove({}, function(err, medias){
 		if(!err) {

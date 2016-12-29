@@ -35,13 +35,13 @@ var mediaRecordRoutes = require("./controllers/mediaRecords");
 var commentRoutes = require("./controllers/comments");
 
 app.use(passport.initialize());
-app.all('/openapi/*', passport.authenticate('facebook-token', {session: false}));
+app.all('/api/*', passport.authenticate('facebook-token', {session: false}));
 
-app.use("/openapi/users", userRoutes);
-app.use("/openapi/medias", mediaRoutes);
-app.use("/openapi/mediaRecords", mediaRecordRoutes);
-app.use("/openapi/userRecords", userRecordRoutes);
-app.use("/openapi/comments", commentRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/medias", mediaRoutes);
+app.use("/api/mediaRecords", mediaRecordRoutes);
+app.use("/api/userRecords", userRecordRoutes);
+app.use("/api/comments", commentRoutes);
 
 // // Cron for deleting media objects after 24hrs
 var MediaCron = require("./helpers/mediaCron");
@@ -62,15 +62,3 @@ app.get("/logout", function(req, res){
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Bastobe server listening on port " + app.get('port'));
 });
-
-// FOR DEVELOPMENT PURPOSES ===================================================
-
-
-var middlewareObj = {};
-middlewareObj.isLoggedIn = function(req, res, next){
-	if(req.isAuthenticated())
-	{
-		return next();
-	}
-	res.send({error: "You are unauthenticated."});
-}

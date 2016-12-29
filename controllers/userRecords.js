@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router()
 var UserRecord = require("../models/userRecord");
 
+// FOR DEVELOPER
 router.delete("/delete", function(req, res){
 	UserRecord.remove({}, function(err, deletedRecords){
 		if(err) {
