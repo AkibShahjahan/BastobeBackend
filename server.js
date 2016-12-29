@@ -34,6 +34,9 @@ var mediaRoutes = require("./controllers/medias");
 var mediaRecordRoutes = require("./controllers/mediaRecords");
 var commentRoutes = require("./controllers/comments");
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use("/openapi/users", userRoutes);
 app.use("/openapi/medias", mediaRoutes);
 app.use("/openapi/mediaRecords", mediaRecordRoutes);
