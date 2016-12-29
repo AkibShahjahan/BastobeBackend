@@ -34,9 +34,7 @@ var mediaRoutes = require("./controllers/medias");
 var mediaRecordRoutes = require("./controllers/mediaRecords");
 var commentRoutes = require("./controllers/comments");
 
-// app.use(passport.initialize());
-// app.use(passport.session());
-
+app.all('/openapi/*', passport.authenticate('facebook-token'));
 
 app.use("/openapi/users", userRoutes);
 app.use("/openapi/medias", mediaRoutes);
@@ -51,8 +49,6 @@ MediaCron.deleteOld.start();
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!
     res.status(200)
-    console.log("LOGGED IN: "+JSON.stringify(req.user));
-
     return res.json({status: 'OK'});
 });
 

@@ -9,7 +9,6 @@ module.exports = function(passport){
         clientID: configAuth.facebookAuth.clientID,
         clientSecret: configAuth.facebookAuth.clientSecret,
     }, function(accessToken, refreshToken, profile, done) {
-        console.log("Access Token: " + accessToken);
         // ADDING status code here screws everythign up
           User.findOne({'facebook.id': profile.id}, function(err, user){
 	    			if(err)
@@ -20,7 +19,11 @@ module.exports = function(passport){
 	    			if(user)
 	    			{
 	    				//res.status(200);
-	    				return done(null, user);
+							console.log("Access Token New: " + accessToken);
+							user.facebook.token = accessToken;
+							user.save(function() {
+								return done(null, user);
+							})
 	    			}
 	    			else {
 	    				var newUser = new User();
