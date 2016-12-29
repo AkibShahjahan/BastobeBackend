@@ -185,7 +185,7 @@ function globalRank(userId, req, res, preview) {
 
 router.get("/rank/:x/:y/:userId", function(req, res){
 	console.log("Authentication Status: " + req.isAuthenticated());
-	console.log("Request Body: " + req.body)
+	console.log("Request Body: " + JSON.stringify(req.body))
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
