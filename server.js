@@ -34,7 +34,8 @@ var mediaRoutes = require("./controllers/medias");
 var mediaRecordRoutes = require("./controllers/mediaRecords");
 var commentRoutes = require("./controllers/comments");
 
-app.all('/openapi/*', passport.authenticate('facebook-token'));
+// app.use(passport.initialize());
+// app.all('/openapi/*', passport.authenticate('facebook-token', {session: false}));
 
 app.use("/openapi/users", userRoutes);
 app.use("/openapi/medias", mediaRoutes);
