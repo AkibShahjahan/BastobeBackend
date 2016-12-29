@@ -70,6 +70,4 @@ middlewareObj.isLoggedIn = function(req, res, next){
 		return next();
 	}
 	res.send({error: "You are unauthenticated."});
-
-  query
 }
