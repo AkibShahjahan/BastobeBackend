@@ -395,6 +395,14 @@ router.post("/", function(req, res){
 	var cordY = req.body.cord_y;
 	var mediaType = req.body.media_type;
 	var pinned = req.body.pinned;
+	console.log("Pinned");
+	console.log(creatorId);
+	console.log(creatorFbId);
+	console.log(captionLabel);
+	console.log(author);
+	console.log(cordX);
+	console.log(mediaType);
+	console.log(pinned):
 	if(creatorId && creatorFbId && (captionLabel || captionLabel == "") && author && cordX && cordY && mediaType && pinned) {
 		// Create the media object
 		var date= new Date();
