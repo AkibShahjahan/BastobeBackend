@@ -5,7 +5,7 @@ var Media = require("../models/media");
 var MediaRecord = require("../models/mediaRecord");
 var MediaRecord = require("../models/userRecord");
 
-
+// =============================================================
 router.get("/", function(req, res){
 	Comment.find({}, function(err, comments){
 		if(err) {
@@ -31,6 +31,7 @@ router.delete("/delete", function(req, res){
 		}
 	})
 });
+// =============================================================
 
 // router.get("/:mediaId", function(req, res){
 //   Comment.findOne({"mediaId": req.params.mediaId}, function(err, comment) {

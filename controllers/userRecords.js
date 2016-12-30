@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router()
 var UserRecord = require("../models/userRecord");
 
-// FOR DEVELOPER
+// =============================================================
 router.delete("/delete", function(req, res){
 	UserRecord.remove({}, function(err, deletedRecords){
 		if(err) {
@@ -29,6 +29,7 @@ router.get("/", function(req, res){
 		}
 	});
 });
+// =============================================================
 
 router.get("/:userId", function(req, res){
 	UserRecord.findOne({"userId": req.params.userId}, function(err, userRecord){

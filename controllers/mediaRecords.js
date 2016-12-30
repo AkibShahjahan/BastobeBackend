@@ -4,6 +4,7 @@ var MediaRecord = require("../models/mediaRecord");
 var MediaHelper = require("../helpers/media");
 var Points = require("../helpers/points");
 
+// =============================================================
 router.delete("/delete", function(req, res){
 	MediaRecord.remove({}, function(err, deletedRecords){
 		if(!err) {
@@ -28,6 +29,7 @@ router.get("/", function(req, res){
 		}
 	});
 });
+// =============================================================
 
 router.get("/:mediaId", function(req, res){
 	MediaRecord.findOne({"mediaId": req.params.mediaId}, function(err, mediaRecord){

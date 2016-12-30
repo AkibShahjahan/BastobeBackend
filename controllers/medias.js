@@ -8,7 +8,6 @@ var UserRecord = require("../models/userRecord");
 var Points = require("../helpers/points");
 var Comment = require("../models/comment");
 
-
 // =============================================================
 router.get("/", function(req, res){
 	Media.find({}, function(err, medias){
@@ -39,11 +38,19 @@ router.delete("/delete", function(req, res){
 
 router.get("/feed/global/:userId", function(req, res){
 	var userId = req.params.userId;
+	// getStream(userId, 0, 0, false, false, false, function(json, status) {
+	// 	res.status(status);
+	// 	res.json(json);
+	// })
 	globalFeed(userId, req, res, false);
 });
 
 router.get("/feed/global/:userId/preview", function(req, res){
 	var userId = req.params.userId;
+	// getStream(userId, 0, 0, false, false, true, function(json, status) {
+	// 	res.status(status);
+	// 	res.json(json);
+	// })
 	globalFeed(userId, req, res, true);
 });
 
@@ -88,6 +95,10 @@ router.get("/feed/:x/:y/:userId", function(req, res){
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
 	var rad = 0.06;
+	// getStream(userId, x, y, true, false, false, function(json, status) {
+	// 	res.status(status);
+	// 	res.json(json);
+	// })
 	localFeed(userId, x, y, rad, req, res, false);
 });
 
@@ -96,6 +107,10 @@ router.get("/feed/:x/:y/:userId/preview", function(req, res){
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
 	var rad = 0.06;
+	// getStream(userId, x, y, true, false, true, function(json, status) {
+	// 	res.status(status);
+	// 	res.json(json);
+	// })
 	localFeed(userId, x, y, rad, req, res, true);
 });
 
@@ -139,10 +154,18 @@ function localFeed(userId, x, y, rad, req, res, preview) {
 
 router.get("/rank/global/:userId", function(req, res){
 	var userId = req.params.userId;
+	// getStream(userId, 0, 0, false, true, false, function(json, status) {
+	// 	res.status(status);
+	// 	res.json(json);
+	// })
 	globalRank(userId, req, res, false)
 });
 router.get("/rank/global/:userId/preview", function(req, res){
 	var userId = req.params.userId;
+	// getStream(userId, 0, 0, false, true, true, function(json, status) {
+	// 	res.status(status);
+	// 	res.json(json);
+	// })
 	globalRank(userId, req, res, true)
 });
 
@@ -191,6 +214,10 @@ router.get("/rank/:x/:y/:userId", function(req, res){
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
 	var rad = 0.06;
+	// getStream(userId, x, y, true, true, false, function(json, status) {
+	// 	res.status(status);
+	// 	res.json(json);
+	// })
 	localRank(userId, x, y, rad, req, res, false);
 });
 router.get("/rank/:x/:y/:userId/preview", function(req, res){
@@ -198,6 +225,10 @@ router.get("/rank/:x/:y/:userId/preview", function(req, res){
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
 	var rad = 0.06;
+	// getStream(userId, x, y, true, true, true, function(json, status) {
+	// 	res.status(status);
+	// 	res.json(json);
+	// })
 	localRank(userId, x, y, rad, req, res, true);
 });
 
@@ -239,6 +270,48 @@ function localRank(userId, x, y, rad, req, res, preview) {
 			});
 		}
 	});
+}
+
+function getStream(userId, x, y, byLocation, byPopularity, isPreview, callback) {
+	var rad = 0.06;
+	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord) {
+		if(err) {
+			res.status(400);
+			res.json({error: err});
+		} else {
+			var userBlockList;
+			if(!foundUserRecord) { userBlockList = []; }
+			else { userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers); }
+			var locationQueryArray = [{"coordinate.x": {$gt: x - rad}},
+											 					{"coordinate.x": {$lt: x + rad}},
+											 					{"coordinate.y": {$gt: y - rad}},
+											 					{"coordinate.y": {$lt: y + rad}}];
+			var queryArray = [];
+			if(byLocation) { queryArray = locationQueryArray; }
+			queryArray.concat([{"creatorId": {$nin: userBlockList}}, {"active": {$ne: false}}]);
+			var query = {$and: queryArray};
+			var popularSort = {};
+			if(byPopularity) { popularSort = {"generalInfo.likes": -1}; }
+			Media.find(query)
+					.sort(popularSort)
+					.sort({time: -1})
+					.exec(function(err, medias) {
+						if(err) {
+							callback({error: err}, 400)
+						} else if(!medias) {
+							callback({error: "Not Found"}, 404);
+						} else {
+							if(preview) {
+								callback(getMediaWithImageId(medias), 200);
+							} else if (medias.length >= 100){
+								callback(medias.slice(0, 100), 200)
+							} else {
+								callback(medias, 200);
+							}
+						}
+			})
+		}
+	})
 }
 
 router.get("/rank/:x/:y/:userId/map", function(req, res){
