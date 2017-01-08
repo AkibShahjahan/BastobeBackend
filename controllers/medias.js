@@ -36,339 +36,81 @@ router.delete("/delete", function(req, res){
 });
 // =============================================================
 
-router.get("/feed/global/:userId", function(req, res){
+router.get("/stream/global/:userId", function(req, res){
 	var userId = req.params.userId;
-	// getStream(userId, 0, 0, false, false, false, function(json, status) {
-	// 	res.status(status);
-	// 	res.json(json);
-	// })
-	globalFeed(userId, req, res, false);
-});
-
-router.get("/feed/global/:userId/preview", function(req, res){
-	var userId = req.params.userId;
-	// getStream(userId, 0, 0, false, false, true, function(json, status) {
-	// 	res.status(status);
-	// 	res.json(json);
-	// })
-	globalFeed(userId, req, res, true);
-});
-
-function globalFeed(userId, req, res, preview) {
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}}]}).sort({time: -1}).exec(function(err, medias) {
-	 			if(err) {
-	  			res.status(400);
-	 			 	res.json({error: err});
-	 			} else if(!medias){
-	 			 	res.status(404);
-	 			 	res.json({error: "Not Found"});
-	 		 	} else {
-					res.status(200);
-					if(preview) {
-						res.json(getMediaWithImageId(medias));
-					} else {
-						if(medias.length >= 100){
-							res.json(medias.slice(0, 100));
-						} else {
-							res.json(medias);
-						}
-					}
-	 		 	}
-	 	 });
-		}
-	})
-}
-
-router.get("/feed/:x/:y/:userId", function(req, res){
-	var userId = req.params.userId;
-	var x = parseFloat(req.params.x);
-	var y = parseFloat(req.params.y);
-	var rad = 0.06;
-	// getStream(userId, x, y, true, false, false, function(json, status) {
-	// 	res.status(status);
-	// 	res.json(json);
-	// })
-	localFeed(userId, x, y, rad, req, res, false);
-});
-
-router.get("/feed/:x/:y/:userId/preview", function(req, res){
-	var userId = req.params.userId;
-	var x = parseFloat(req.params.x);
-	var y = parseFloat(req.params.y);
-	var rad = 0.06;
-	// getStream(userId, x, y, true, false, true, function(json, status) {
-	// 	res.status(status);
-	// 	res.json(json);
-	// })
-	localFeed(userId, x, y, rad, req, res, true);
-});
-
-function localFeed(userId, x, y, rad, req, res, preview) {
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
-												{"coordinate.x": {$lt: x + rad}},
-												{"coordinate.y": {$gt: y - rad}},
-												{"coordinate.y": {$lt: y + rad}},
-												{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}}]}).sort({time: -1})
-												.exec(function(err, medias) {
-													if(err) {
-														res.status(400);
-														res.json({error: err});
-													} else if(!medias) {
-														res.status(404);
-														res.json({error: "Not Found"});
-													} else {
-														res.status(200);
-														if(preview) {
-															res.json(getMediaWithImageId(medias));
-														}
-														else {
-															res.json(medias);
-														}
-													}
-			});
-		}
+	MediaHelper.getFeed(userId, 0, 0, false, false, false, false, function(json, status) {
+		res.status(status);
+		res.json(json);
 	});
-}
+});
 
+router.get("/stream/global/:userId/preview", function(req, res){
+	var userId = req.params.userId;
+	MediaHelper.getFeed(userId, 0, 0, false, false, true, false, function(json, status) {
+		res.status(status);
+		res.json(json);
+	});
+});
+router.get("/stream/:x/:y/:userId", function(req, res){
+	var userId = req.params.userId;
+	var x = parseFloat(req.params.x);
+	var y = parseFloat(req.params.y);
+	var rad = 0.06;
+	MediaHelper.getFeed(userId, x, y, false, true, false, false, function(json, status) {
+		res.status(status);
+		res.json(json);
+	});
+});
+router.get("/stream/:x/:y/:userId/preview", function(req, res){
+	var userId = req.params.userId;
+	var x = parseFloat(req.params.x);
+	var y = parseFloat(req.params.y);
+	MediaHelper.getFeed(userId, x, y, false, true, true, false, function(json, status) {
+		res.status(status);
+		res.json(json);
+	});
+});
 router.get("/rank/global/:userId", function(req, res){
 	var userId = req.params.userId;
-	// getStream(userId, 0, 0, false, true, false, function(json, status) {
-	// 	res.status(status);
-	// 	res.json(json);
-	// })
-	globalRank(userId, req, res, false)
+	MediaHelper.getFeed(userId, 0, 0, true, false, false, false, function(json, status) {
+		res.status(status);
+		res.json(json);
+	});
 });
 router.get("/rank/global/:userId/preview", function(req, res){
 	var userId = req.params.userId;
-	// getStream(userId, 0, 0, false, true, true, function(json, status) {
-	// 	res.status(status);
-	// 	res.json(json);
-	// })
-	globalRank(userId, req, res, true)
+	MediaHelper.getFeed(userId, 0, 0, true, false, true, false, function(json, status) {
+		res.status(status);
+		res.json(json);
+	});
 });
-
-function globalRank(userId, req, res, preview) {
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}}]}).sort({"generalInfo.likes": -1})
-																											.sort({time: -1})
-																											.exec(function(err, medias) {
-	 			if(err) {
-	  			res.status(400);
-	 			 	res.json({error: err});
-	 			} else if(!medias){
-	 			 	res.status(404);
-	 			 	res.json({error: "Not Found"});
-	 		 	} else {
-					res.status(200);
-					if(preview) {
-						res.json(getMediaWithImageId(medias));
-					} else {
-						if(medias.length >= 100){
-							res.json(medias.slice(0, 100));
-						} else {
-							res.json(medias);
-						}
-					}
-	 		 	}
-	 	 });
-		}
-	})
-}
-
 router.get("/rank/:x/:y/:userId", function(req, res){
-	console.log("Authentication Status: " + req.isAuthenticated());
-	console.log("Request Body: " + JSON.stringify(req.body))
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.06;
-	// getStream(userId, x, y, true, true, false, function(json, status) {
-	// 	res.status(status);
-	// 	res.json(json);
-	// })
-	localRank(userId, x, y, rad, req, res, false);
+	MediaHelper.getFeed(userId, x, y, true, true, false, false, function(json, status) {
+		res.status(status);
+		res.json(json);
+	});
 });
 router.get("/rank/:x/:y/:userId/preview", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.06;
-	// getStream(userId, x, y, true, true, true, function(json, status) {
-	// 	res.status(status);
-	// 	res.json(json);
-	// })
-	localRank(userId, x, y, rad, req, res, true);
-});
-
-function localRank(userId, x, y, rad, req, res, preview) {
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
-											 	{"coordinate.x": {$lt: x + rad}},
-											 	{"coordinate.y": {$gt: y - rad}},
-											 	{"coordinate.y": {$lt: y + rad}},
-												{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}}]})
-												.sort({"generalInfo.likes": -1})
-												.sort({time: -1})
-												.exec(function(err, medias) {
-													if(err) {
-														res.status(400);
-														res.json({error: err});
-													} else if(!medias) {
-														res.status(404);
-														res.json({error: "Not Found"});
-													} else {
-														res.status(200);
-														if(preview) {
-															res.json(getMediaWithImageId(medias));
-														}
-														else {
-															res.json(medias);
-														}
-													}
-			});
-		}
+	MediaHelper.getFeed(userId, x, y, true, true, true, false, function(json, status) {
+		res.status(status);
+		res.json(json);
 	});
-}
-
-function getStream(userId, x, y, byLocation, byPopularity, isPreview, callback) {
-	var rad = 0.06;
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord) {
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else { userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers); }
-			var locationQueryArray = [{"coordinate.x": {$gt: x - rad}},
-											 					{"coordinate.x": {$lt: x + rad}},
-											 					{"coordinate.y": {$gt: y - rad}},
-											 					{"coordinate.y": {$lt: y + rad}}];
-			var queryArray = [];
-			if(byLocation) { queryArray = locationQueryArray; }
-			queryArray.concat([{"creatorId": {$nin: userBlockList}}, {"active": {$ne: false}}]);
-			var query = {$and: queryArray};
-			var popularSort = {};
-			if(byPopularity) { popularSort = {"generalInfo.likes": -1}; }
-			Media.find(query)
-					.sort(popularSort)
-					.sort({time: -1})
-					.exec(function(err, medias) {
-						if(err) {
-							callback({error: err}, 400)
-						} else if(!medias) {
-							callback({error: "Not Found"}, 404);
-						} else {
-							if(preview) {
-								callback(getMediaWithImageId(medias), 200);
-							} else if (medias.length >= 100){
-								callback(medias.slice(0, 100), 200)
-							} else {
-								callback(medias, 200);
-							}
-						}
-			})
-		}
-	})
-}
-
+});
 router.get("/rank/:x/:y/:userId/map", function(req, res){
 	var userId = req.params.userId;
 	var x = parseFloat(req.params.x);
 	var y = parseFloat(req.params.y);
-	var rad = 0.06;
-
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
-											 	{"coordinate.x": {$lt: x + rad}},
-											 	{"coordinate.y": {$gt: y - rad}},
-											 	{"coordinate.y": {$lt: y + rad}},
-												{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}},
-												{"pinned": {$eq: true}}]})
-												.sort({"generalInfo.likes": -1})
-												.sort({time: -1})
-												.exec(function(err, medias) {
-													if(err) {
-														res.status(400);
-														res.json({error: err});
-													} else if(!medias) {
-														res.status(404);
-														res.json({error: "Not Found"});
-													} else {
-														res.status(200);
-														if(medias.length >= 25){
-															res.json(medias.slice(0, 25));
-														} else {
-															res.json(medias);
-														}
-													}
-			});
-		}
+	MediaHelper.getFeed(userId, x, y, true, true, false, true, function(json, status) {
+		res.status(status);
+		res.json(json);
 	});
 });
-function getMediaWithImageId(medias) {
-	var len = medias.length;
-	var retVal = [];
-	for(var i = 0; i<len; i++) {
-		if(medias[i].mediaType == "Photo") {
-			retVal[0] = medias[i]._id;
-			break;
-		}
-	}
-	return retVal;
-}
 
 router.get("/:id", function(req, res){
 	Media.findById(req.params.id, function(err, media){
@@ -391,18 +133,10 @@ router.post("/", function(req, res){
 	var creatorFbId = req.body.creator_fb_id;
 	var captionLabel = req.body.caption_label;
 	var author = req.body.author;
-	var cordX = req.body.cord_x;
+	var cordX =  req.body.cord_x;
 	var cordY = req.body.cord_y;
 	var mediaType = req.body.media_type;
 	var pinned = req.body.pinned;
-	console.log("Pinned");
-	console.log(creatorId);
-	console.log(creatorFbId);
-	console.log(captionLabel);
-	console.log(author);
-	console.log(cordX);
-	console.log(mediaType);
-	console.log(pinned):
 	if(creatorId && creatorFbId && (captionLabel || captionLabel == "") && author && cordX && cordY && mediaType && pinned) {
 		// Create the media object
 		var date= new Date();
@@ -469,7 +203,6 @@ router.post("/", function(req, res){
 router.delete("/:id/:deleterId", function(req, res){
 	var deleterId = req.params.deleterId;
 	var mediaId = req.params.id;
-	console.log(deleterId);
 	if(deleterId) {
 		Media.findById(mediaId, function(err, media) {
 			if(media) {
@@ -724,10 +457,10 @@ router.post("/comments", function(req, res){
   var creatorName = req.body.creator_name;
   var mediaId = req.body.media_id;
   var commentContent = req.body.comment_content;
-	var userLat = req.body.user_lat;
-	var userLong = req.body.user_long;
-	var mediaLat = req.body.media_lat;
-	var mediaLong = req.body.media_long;
+	var userLat = parseFloat(req.body.user_lat);
+	var userLong = parseFloat(req.body.user_long);
+	var mediaLat = parseFloat(req.body.media_lat);
+	var mediaLong = parseFloat(req.body.media_long);
 	if(creatorId && creatorFbId && mediaId && commentContent && creatorName && userLat && userLong
 		&& mediaLat && mediaLong && MediaHelper.isWithinAccessRadius(mediaLat, mediaLong, userLat, userLong)) {
 		// Create the comment object
@@ -743,27 +476,26 @@ router.post("/comments", function(req, res){
 		};
 		// Create the comment
 		Comment.create(newComment, function(err, newCreation) {
-			console.log("CREATED");
 			if(err) {
 				res.status(400);
 				res.json({error: "Creation failed"});
 			} else {
         var newCommentId = newCreation._id.toString();
-				MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
-          if(foundMediaRecord && foundMediaRecord.commentRecord.indexOf(newCommentId) == -1){
-            foundMediaRecord.commentRecord.push(newCommentId);
-            foundMediaRecord.save();
-          }
-        })
-        UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
+				UserRecord.findOne({"userId": creatorId}, function(err, foundUserRecord){
           if(foundUserRecord && foundUserRecord.commentRecord.indexOf(mediaId) == -1){
             foundUserRecord.commentRecord.push(mediaId);
             foundUserRecord.save();
           }
         })
-        res.status(201);
-        res.json({response: "Creation successful"});
-
+				MediaRecord.findOne({"mediaId": mediaId}, function(err, foundMediaRecord) {
+          if(foundMediaRecord && foundMediaRecord.commentRecord.indexOf(newCommentId) == -1){
+            foundMediaRecord.commentRecord.push(newCommentId);
+            foundMediaRecord.save(function() {
+							res.status(201);
+			        res.json({response: "Creation successful"});
+						});
+          }
+        })
 			}
 		});
 	} else {
@@ -771,157 +503,6 @@ router.post("/comments", function(req, res){
 		res.json({error: "The POST request must have 'creator_id', 'creator_fbid', \
     'creator_name', 'media_id', 'comment_content', 'cord_x', and 'cord_y' keys. Or you may not be in the access radius."})
 	}
-});
-
-
-router.get("/photo/feed/global/:userId", function(req, res){
-	var userId = req.params.userId;
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}}]}).where("mediaType", "Photo")
-												.sort({time: -1}).exec(function(err, medias) {
-	 			if(err) {
-	  			res.status(400);
-	 			 	res.json({error: err});
-	 			} else if(!medias){
-	 			 	res.status(404);
-	 			 	res.json({error: "Not Found"});
-	 		 	} else {
-					res.status(200);
-					if(medias.length >= 100){
-						res.json(medias.slice(0, 100));
-					} else {
-						res.json(medias);
-					}
-	 		 	}
-	 	 });
-		}
-	})
-});
-
-router.get("/photo/feed/:x/:y/:userId", function(req, res){
-	var userId = req.params.userId;
-	var x = parseFloat(req.params.x);
-	var y = parseFloat(req.params.y);
-	var rad = 0.06;
-
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
-											 	{"coordinate.x": {$lt: x + rad}},
-											 	{"coordinate.y": {$gt: y - rad}},
-											 	{"coordinate.y": {$lt: y + rad}},
-												{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}}]}).where("mediaType", "Photo")
-												.sort({time: -1})
-												.exec(function(err, medias) {
-													if(err) {
-														res.status(400);
-														res.json({error: err});
-													} else if(!medias) {
-														res.status(404);
-														res.json({error: "Not Found"});
-													} else {
-														res.status(200);
-														res.json(medias);
-													}
-			});
-		}
-	});
-});
-
-// Send only first 100 (?)
-router.get("/photo/rank/global/:userId", function(req, res){
-	var userId = req.params.userId;
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}}]}).sort({"generalInfo.likes": -1})
-																											.where("mediaType", "Photo")
-																											.sort({time: -1})
-																											.exec(function(err, medias) {
-	 			if(err) {
-	  			res.status(400);
-	 			 	res.json({error: err});
-	 			} else if(!medias){
-	 			 	res.status(404);
-	 			 	res.json({error: "Not Found"});
-	 		 	} else {
-					res.status(200);
-					if(medias.length >= 100){
-						res.json(medias.slice(0, 100));
-					} else {
-						res.json(medias);
-					}
-	 		 	}
-	 	 });
-		}
-	})
-});
-
-router.get("/photo/rank/:x/:y/:userId", function(req, res){
-	var userId = req.params.userId;
-	var x = parseFloat(req.params.x);
-	var y = parseFloat(req.params.y);
-	var rad = 0.06;
-
-	UserRecord.findOne({"userId": userId}, function(err, foundUserRecord){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else {
-			var userBlockList;
-			if(!foundUserRecord) { userBlockList = []; }
-			else {
-				userBlockList = (foundUserRecord.blockedUsers).concat(foundUserRecord.blockedByUsers);
-			}
-			Media.find({$and: [{"coordinate.x": {$gt: x - rad}},
-											 	{"coordinate.x": {$lt: x + rad}},
-											 	{"coordinate.y": {$gt: y - rad}},
-											 	{"coordinate.y": {$lt: y + rad}},
-												{"creatorId": {$nin: userBlockList}},
-												{"active": {$ne: false}}]}).where("mediaType", "Photo")
-												.sort({"generalInfo.likes": -1})
-												.sort({time: -1})
-												.exec(function(err, medias) {
-													if(err) {
-														res.status(400);
-														res.json({error: err});
-													} else if(!medias) {
-														res.status(404);
-														res.json({error: "Not Found"});
-													} else {
-														res.status(200);
-														res.json(medias);
-													}
-			});
-		}
-	});
 });
 
 module.exports = router;

@@ -50,14 +50,8 @@ MediaCron.deleteOld.start();
 app.post('/login/facebook', passport.authenticate('facebook-token', {session: false}), function(req, res) {
     // Congratulations, you're authenticated!
     res.status(req.user? 200:401)
-    return res.json(req.user? req.user: {error: "Something went wrong"});
+    return res.json(req.user? req.user:{error: "Something went wrong"});
 });
-
-app.get("/logout", function(req, res){
-	res.status(200);
-	req.logout();
-})
-
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Bastobe server listening on port " + app.get('port'));
