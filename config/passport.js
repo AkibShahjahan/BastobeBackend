@@ -19,7 +19,7 @@ module.exports = function(passport){
 	    			if(user)
 	    			{
 	    				//res.status(200);
-							user.facebook.token = accessToken;
+							// user.facebook.token = accessToken;
 							user.save(function() {
 								return done(null, user);
 							})
