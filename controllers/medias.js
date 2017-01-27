@@ -9,31 +9,31 @@ var Points = require("../helpers/points");
 var Comment = require("../models/comment");
 
 // =============================================================
-router.get("/", function(req, res){
-	Media.find({}, function(err, medias){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else if(!medias) {
-			res.status(404);
-			res.json({error: "Not Found"});
-		} else {
-			res.json(medias);
-		}
-	});
-});
-
-router.delete("/delete", function(req, res){
-	Media.remove({}, function(err, medias){
-		if(!err) {
-			res.status(200);
-			res.json({success: "All entities have been removed."});
-		} else {
-			res.status(400);
-			res.json({error: "Sorry, the deletion was not successful"})
-		}
-	})
-});
+// router.get("/", function(req, res){
+// 	Media.find({}, function(err, medias){
+// 		if(err) {
+// 			res.status(400);
+// 			res.json({error: err});
+// 		} else if(!medias) {
+// 			res.status(404);
+// 			res.json({error: "Not Found"});
+// 		} else {
+// 			res.json(medias);
+// 		}
+// 	});
+// });
+//
+// router.delete("/delete", function(req, res){
+// 	Media.remove({}, function(err, medias){
+// 		if(!err) {
+// 			res.status(200);
+// 			res.json({success: "All entities have been removed."});
+// 		} else {
+// 			res.status(400);
+// 			res.json({error: "Sorry, the deletion was not successful"})
+// 		}
+// 	})
+// });
 // =============================================================
 
 router.get("/stream/global/:userId", function(req, res){
@@ -74,6 +74,7 @@ router.get("/rank/global/:userId", function(req, res){
 	var userId = req.params.userId;
 	MediaHelper.getFeed(userId, 0, 0, true, false, false, false, function(json, status) {
 		res.status(status);
+		console.log(status);
 		res.json(json);
 	});
 });

@@ -27,9 +27,6 @@ var mediaRecordSchema = new mongoose.Schema({
       ref: "Comment"
     }
   ],
-  // TODO: Adds to this list when another user flags _this media [1hr max]
-  //        - frontend> when getting media, also stores media flagRecord
-  //                  > calls this endpoint if not already flagged
   flagRecord: [
     {
       type: mongoose.Schema.Types.ObjectId,

@@ -6,31 +6,31 @@ var MediaRecord = require("../models/mediaRecord");
 var MediaRecord = require("../models/userRecord");
 
 // =============================================================
-router.get("/", function(req, res){
-	Comment.find({}, function(err, comments){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else if(!comments) {
-			res.status(404);
-			res.json({error: "Not Found"});
-		} else {
-			res.json(comments);
-		}
-	});
-});
-
-router.delete("/delete", function(req, res){
-	Comment.remove({}, function(err, comments){
-		if(!err) {
-			res.status(200);
-			res.json({success: "All entities have been removed."});
-		} else {
-			res.status(400);
-			res.json({error: "Sorry, the deletion was not successful"})
-		}
-	})
-});
+// router.get("/", function(req, res){
+// 	Comment.find({}, function(err, comments){
+// 		if(err) {
+// 			res.status(400);
+// 			res.json({error: err});
+// 		} else if(!comments) {
+// 			res.status(404);
+// 			res.json({error: "Not Found"});
+// 		} else {
+// 			res.json(comments);
+// 		}
+// 	});
+// });
+//
+// router.delete("/delete", function(req, res){
+// 	Comment.remove({}, function(err, comments){
+// 		if(!err) {
+// 			res.status(200);
+// 			res.json({success: "All entities have been removed."});
+// 		} else {
+// 			res.status(400);
+// 			res.json({error: "Sorry, the deletion was not successful"})
+// 		}
+// 	})
+// });
 // =============================================================
 
 // router.get("/:mediaId", function(req, res){

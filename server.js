@@ -35,7 +35,7 @@ var mediaRecordRoutes = require("./controllers/mediaRecords");
 var commentRoutes = require("./controllers/comments");
 
 app.use(passport.initialize());
-app.all('/api/*', passport.authenticate('facebook-token', {session: false})); // TODO: UNCOMMENT
+app.all('/api/*', passport.authenticate('facebook-token', {session: false}));
 
 app.use("/api/users", userRoutes);
 app.use("/api/medias", mediaRoutes);

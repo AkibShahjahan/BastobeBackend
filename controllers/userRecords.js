@@ -3,32 +3,32 @@ var router = express.Router()
 var UserRecord = require("../models/userRecord");
 
 // =============================================================
-router.delete("/delete", function(req, res){
-	UserRecord.remove({}, function(err, deletedRecords){
-		if(err) {
-			res.status(400);
-			res.json({error: "Sorry, the deletion was not successful"})
-		} else {
-			res.status(200);
-			res.json({success: "All entities have been removed."});
-		}
-	})
-})
-
-router.get("/", function(req, res){
-	UserRecord.find({}, function(err, userRecords){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else if (!userRecords){
-			res.status(404);
-			res.json({error: "Not Found"});
-		} else {
-			res.status(200);
-			res.send(userRecords);
-		}
-	});
-});
+// router.delete("/delete", function(req, res){
+// 	UserRecord.remove({}, function(err, deletedRecords){
+// 		if(err) {
+// 			res.status(400);
+// 			res.json({error: "Sorry, the deletion was not successful"})
+// 		} else {
+// 			res.status(200);
+// 			res.json({success: "All entities have been removed."});
+// 		}
+// 	})
+// })
+//
+// router.get("/", function(req, res){
+// 	UserRecord.find({}, function(err, userRecords){
+// 		if(err) {
+// 			res.status(400);
+// 			res.json({error: err});
+// 		} else if (!userRecords){
+// 			res.status(404);
+// 			res.json({error: "Not Found"});
+// 		} else {
+// 			res.status(200);
+// 			res.send(userRecords);
+// 		}
+// 	});
+// });
 // =============================================================
 
 router.get("/:userId", function(req, res){

@@ -5,30 +5,30 @@ var MediaHelper = require("../helpers/media");
 var Points = require("../helpers/points");
 
 // =============================================================
-router.delete("/delete", function(req, res){
-	MediaRecord.remove({}, function(err, deletedRecords){
-		if(!err) {
-			res.json({success: "All entities have been removed."});
-		} else {
-			res.json({error: "Sorry, the deletion was not successful"})
-		}
-	})
-})
-
-router.get("/", function(req, res){
-	MediaRecord.find({}, function(err, mediaRecords){
-		if(err) {
-			res.status(400);
-			res.json({error: err});
-		} else if (!mediaRecords) {
-			res.status(404);
-			res.json({error: "Not Found"});
-		}
-		else {
-			res.send(mediaRecords);
-		}
-	});
-});
+// router.delete("/delete", function(req, res){
+// 	MediaRecord.remove({}, function(err, deletedRecords){
+// 		if(!err) {
+// 			res.json({success: "All entities have been removed."});
+// 		} else {
+// 			res.json({error: "Sorry, the deletion was not successful"})
+// 		}
+// 	})
+// })
+//
+// router.get("/", function(req, res){
+// 	MediaRecord.find({}, function(err, mediaRecords){
+// 		if(err) {
+// 			res.status(400);
+// 			res.json({error: err});
+// 		} else if (!mediaRecords) {
+// 			res.status(404);
+// 			res.json({error: "Not Found"});
+// 		}
+// 		else {
+// 			res.send(mediaRecords);
+// 		}
+// 	});
+// });
 // =============================================================
 
 router.get("/:mediaId", function(req, res){
@@ -115,8 +115,7 @@ function getRecord(recordType, req, res) {
 		} else {
 			res.status(200);
 			if(recordType=="commentRecord") {
-				// TODO: will have to change this to json
-				res.send(mediaRecord.commentRecord);
+				res.json(mediaRecord.commentRecord);
 			}
 		}
 	});
